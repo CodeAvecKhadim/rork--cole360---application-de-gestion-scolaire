@@ -7,7 +7,9 @@ import { useAuth } from '@/hooks/auth-store';
 import { UserRole } from '@/types/auth';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
-import { User, Mail, Lock, Eye, EyeOff, ArrowLeft, School, Users, BookOpen, UserCheck } from 'lucide-react-native';
+import CountryPicker from '@/components/CountryPicker';
+import { Country, DEFAULT_COUNTRY } from '@/constants/countries';
+import { User, Mail, Lock, Eye, EyeOff, ArrowLeft, School, Users, BookOpen, UserCheck, Phone } from 'lucide-react-native';
 
 const roleOptions = [
   {
@@ -43,6 +45,8 @@ export default function SignUpScreen() {
     confirmPassword: '',
     role: 'parent' as UserRole,
     schoolName: '',
+    phone: '',
+    country: DEFAULT_COUNTRY,
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -86,9 +90,29 @@ export default function SignUpScreen() {
       return;
     }
 
+    if (!formData.phone.trim()) {
+      setError('Veuillez saisir votre numéro de téléphone');
+      return;
+    }
+
+    // Validation du numéro de téléphone (doit contenir uniquement des chiffres)
+    const phoneRegex = /^[0-9]{8,15}$/;
+    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+      setError('Veuillez saisir un numéro de téléphone valide (8-15 chiffres)');
+      return;
+    }
+
     try {
       setError('');
-      await signup(formData);
+      // Préparer les données avec les informations du pays
+      const signupData = {
+        ...formData,
+        country: formData.country.name,
+        countryCode: formData.country.code,
+        phone: formData.country.dialCode + formData.phone.replace(/\s/g, ''),
+      };
+      
+      await signup(signupData);
       
       Alert.alert(
         'Compte créé !',
@@ -113,8 +137,12 @@ export default function SignUpScreen() {
     }
   };
 
-  const updateFormData = (field: string, value: string) => {
+  const updateFormData = (field: string, value: string | Country) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCountrySelect = (country: Country) => {
+    setFormData(prev => ({ ...prev, country }));
   };
 
   if (step === 1) {
@@ -240,6 +268,30 @@ export default function SignUpScreen() {
                     style={styles.input}
                     testID="email-input"
                   />
+                </View>
+
+                {/* Sélection du pays et numéro de téléphone */}
+                <View style={styles.phoneContainer}>
+                  <Text style={styles.phoneLabel}>Numéro de téléphone</Text>
+                  <View style={styles.phoneInputContainer}>
+                    <CountryPicker
+                      selectedCountry={formData.country}
+                      onCountrySelect={handleCountrySelect}
+                      style={styles.countryPicker}
+                      testID="country-picker"
+                    />
+                    <View style={styles.phoneInputWrapper}>
+                      <Phone size={20} color={COLORS.gray} style={styles.inputIcon} />
+                      <Input
+                        value={formData.phone}
+                        onChangeText={(value) => updateFormData('phone', value)}
+                        placeholder="Numéro de téléphone"
+                        keyboardType="phone-pad"
+                        style={styles.phoneInput}
+                        testID="phone-input"
+                      />
+                    </View>
+                  </View>
                 </View>
 
                 {formData.role === 'schoolAdmin' && (
@@ -539,5 +591,38 @@ const styles = StyleSheet.create({
   loginLinkBold: {
     fontWeight: '600' as const,
     color: COLORS.primary,
+  },
+  phoneContainer: {
+    marginBottom: 16,
+  },
+  phoneLabel: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  phoneInputContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  countryPicker: {
+    flex: 0,
+    minWidth: 110,
+  },
+  phoneInputWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+  },
+  phoneInput: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    paddingHorizontal: 0,
   },
 });

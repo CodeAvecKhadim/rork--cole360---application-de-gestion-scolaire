@@ -7,6 +7,9 @@ export interface User {
   role: UserRole;
   avatar?: string;
   schoolId?: string;
+  country: string;
+  countryCode: string;
+  phone: string;
   createdAt: number;
 }
 

@@ -12,6 +12,9 @@ const mockUsers = [
     name: 'Administrateur Principal',
     role: 'admin' as UserRole,
     avatar: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=200&auto=format&fit=crop',
+    country: 'Sénégal',
+    countryCode: 'SN',
+    phone: '+221771234567',
     createdAt: Date.now(),
   },
   {
@@ -22,6 +25,9 @@ const mockUsers = [
     role: 'schoolAdmin' as UserRole,
     schoolId: '1',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop',
+    country: 'Sénégal',
+    countryCode: 'SN',
+    phone: '+221771234568',
     createdAt: Date.now(),
   },
   {
@@ -32,6 +38,9 @@ const mockUsers = [
     role: 'teacher' as UserRole,
     schoolId: '1',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
+    country: 'France',
+    countryCode: 'FR',
+    phone: '+33612345678',
     createdAt: Date.now(),
   },
   {
@@ -41,6 +50,9 @@ const mockUsers = [
     name: 'Jean Martin',
     role: 'parent' as UserRole,
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop',
+    country: 'Côte d\'Ivoire',
+    countryCode: 'CI',
+    phone: '+2250712345678',
     createdAt: Date.now(),
   },
 ];
@@ -115,6 +127,9 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     password: string;
     role: UserRole;
     schoolName?: string;
+    country: string;
+    countryCode: string;
+    phone: string;
   }) => {
     try {
       setLoading(true);
@@ -141,6 +156,9 @@ export const [AuthContext, useAuth] = createContextHook(() => {
         role: formData.role,
         avatar: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000)}?q=80&w=200&auto=format&fit=crop`,
         schoolId: formData.role === 'schoolAdmin' ? Date.now().toString() : undefined,
+        country: formData.country,
+        countryCode: formData.countryCode,
+        phone: formData.phone,
         createdAt: Date.now(),
       };
       

@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/auth-store';
 import Avatar from '@/components/Avatar';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import { User, Mail, School, BookOpen } from 'lucide-react-native';
+import { User, Mail, School, BookOpen, Phone, Globe } from 'lucide-react-native';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -68,6 +68,16 @@ export default function ProfileScreen() {
           <Mail size={20} color={COLORS.gray} />
           <Text style={styles.infoLabel}>Email :</Text>
           <Text style={styles.infoValue}>{user?.email}</Text>
+        </View>
+        <View style={styles.infoItem}>
+          <Phone size={20} color={COLORS.gray} />
+          <Text style={styles.infoLabel}>Téléphone :</Text>
+          <Text style={styles.infoValue}>{user?.phone}</Text>
+        </View>
+        <View style={styles.infoItem}>
+          <Globe size={20} color={COLORS.gray} />
+          <Text style={styles.infoLabel}>Pays :</Text>
+          <Text style={styles.infoValue}>{user?.country}</Text>
         </View>
         {user?.role === 'schoolAdmin' && user?.schoolId && (
           <View style={styles.infoItem}>
