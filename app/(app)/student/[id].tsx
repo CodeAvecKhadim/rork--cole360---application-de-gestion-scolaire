@@ -7,7 +7,7 @@ import Card from '@/components/Card';
 import Avatar from '@/components/Avatar';
 import GradeItem from '@/components/GradeItem';
 import AttendanceItem from '@/components/AttendanceItem';
-import { Button } from '@/components/Button';
+import Button from '@/components/Button';
 import { BookOpen, Clock, FileText } from 'lucide-react-native';
 
 export default function StudentDetailScreen() {
