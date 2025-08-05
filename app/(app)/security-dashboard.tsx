@@ -109,7 +109,7 @@ export default function SecurityDashboard() {
           </View>
           <Text style={styles.statLabel}>Tentatives 24h</Text>
           {stats.suspiciousActivity && (
-            <Badge text="Activité suspecte" variant="danger" style={styles.alertBadge} />
+            <Badge label="Activité suspecte" variant="danger" style={styles.alertBadge} />
           )}
         </Card>
 
@@ -171,7 +171,7 @@ export default function SecurityDashboard() {
               <Text style={styles.attemptTime}>{formatDate(attempt.timestamp)}</Text>
             </View>
             <Badge 
-              text={attempt.success ? 'Succès' : 'Échec'} 
+              label={attempt.success ? 'Succès' : 'Échec'} 
               variant={attempt.success ? 'success' : 'danger'} 
             />
           </View>
@@ -233,7 +233,7 @@ export default function SecurityDashboard() {
               </Text>
             </View>
             <Badge 
-              text={session.expiresAt > Date.now() ? 'Active' : 'Expirée'} 
+              label={session.expiresAt > Date.now() ? 'Active' : 'Expirée'} 
               variant={session.expiresAt > Date.now() ? 'success' : 'warning'} 
             />
           </View>
@@ -289,7 +289,7 @@ export default function SecurityDashboard() {
               <Text style={styles.logTime}>{formatDate(log.timestamp)}</Text>
             </View>
             <Badge 
-              text={log.success ? 'Succès' : 'Échec'} 
+              label={log.success ? 'Succès' : 'Échec'} 
               variant={log.success ? 'success' : 'danger'} 
             />
           </View>
