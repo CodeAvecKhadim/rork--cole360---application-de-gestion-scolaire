@@ -26,6 +26,7 @@ export default function AppLayout() {
       <Stack.Screen name="student/[id]" options={{ headerShown: true, title: 'Détails de l\'élève' }} />
       <Stack.Screen name="school/[id]" options={{ headerShown: true, title: 'Détails de l\'école' }} />
       <Stack.Screen name="bulletin/[studentId]" options={{ headerShown: true, title: 'Bulletin de l\'élève' }} />
+      <Stack.Screen name="security-dashboard" options={{ headerShown: true, title: 'Sécurité' }} />
     </Stack>
   );
 }

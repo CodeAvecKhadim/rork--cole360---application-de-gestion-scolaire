@@ -12,9 +12,10 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 // Import du provider pour les gestes tactiles
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-// Import des contextes personnalisés pour l'authentification et les données
+// Import des contextes personnalisés pour l'authentification, les données et la sécurité
 import { AuthContext } from "@/hooks/auth-store";
 import { DataContext } from "@/hooks/data-store";
+import { SecurityContext } from "@/hooks/security-store";
 
 // Empêcher l'écran de démarrage de se cacher automatiquement
 // Cela nous permet de contrôler quand l'écran de démarrage disparaît
@@ -62,16 +63,19 @@ export default function RootLayout() {
   return (
     // Provider React Query (doit être le plus haut niveau)
     <QueryClientProvider client={queryClient}>
-      {/* Provider d'authentification */}
-      <AuthContext>
-        {/* Provider de données */}
-        <DataContext>
-          {/* Provider pour les gestes (nécessaire pour certains composants) */}
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <RootLayoutNav />
-          </GestureHandlerRootView>
-        </DataContext>
-      </AuthContext>
+      {/* Provider de sécurité (doit être avant l'authentification) */}
+      <SecurityContext>
+        {/* Provider d'authentification */}
+        <AuthContext>
+          {/* Provider de données */}
+          <DataContext>
+            {/* Provider pour les gestes (nécessaire pour certains composants) */}
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <RootLayoutNav />
+            </GestureHandlerRootView>
+          </DataContext>
+        </AuthContext>
+      </SecurityContext>
     </QueryClientProvider>
   );
 }

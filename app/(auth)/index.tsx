@@ -196,10 +196,13 @@ export default function LoginScreen() {
                 <View style={styles.demoContainer}>
                   <Text style={styles.demoTitle}>Comptes de démonstration :</Text>
                   <Text style={styles.demoText}>• Administrateur : admin@ecole-360.com</Text>
+                  <Text style={styles.demoPassword}>Mot de passe : AdminSecure123!</Text>
                   <Text style={styles.demoText}>• Directeur : school@ecole-360.com</Text>
+                  <Text style={styles.demoPassword}>Mot de passe : SchoolAdmin123!</Text>
                   <Text style={styles.demoText}>• Professeur : teacher@ecole-360.com</Text>
+                  <Text style={styles.demoPassword}>Mot de passe : Teacher123!</Text>
                   <Text style={styles.demoText}>• Parent : parent@ecole-360.com</Text>
-                  <Text style={styles.demoPassword}>Mot de passe : password</Text>
+                  <Text style={styles.demoPassword}>Mot de passe : Parent123!</Text>
                 </View>
               )}
             </View>

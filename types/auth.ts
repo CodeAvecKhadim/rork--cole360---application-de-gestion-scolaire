@@ -1,5 +1,59 @@
 export type UserRole = 'admin' | 'schoolAdmin' | 'teacher' | 'parent';
 
+// Interface pour les permissions utilisateur
+export interface UserPermissions {
+  canViewStudents: boolean;
+  canEditStudents: boolean;
+  canViewGrades: boolean;
+  canEditGrades: boolean;
+  canViewAttendance: boolean;
+  canEditAttendance: boolean;
+  canViewMessages: boolean;
+  canSendMessages: boolean;
+  canManageSchool: boolean;
+  canManageUsers: boolean;
+  canViewReports: boolean;
+  canExportData: boolean;
+}
+
+// Interface pour les sessions utilisateur
+export interface UserSession {
+  id: string;
+  userId: string;
+  deviceId: string;
+  deviceName: string;
+  ipAddress: string;
+  userAgent: string;
+  isActive: boolean;
+  lastActivity: number;
+  createdAt: number;
+  expiresAt: number;
+}
+
+// Interface pour les tentatives de connexion
+export interface LoginAttempt {
+  id: string;
+  email: string;
+  ipAddress: string;
+  userAgent: string;
+  success: boolean;
+  failureReason?: string;
+  timestamp: number;
+}
+
+// Interface pour les logs de sécurité
+export interface SecurityLog {
+  id: string;
+  userId?: string;
+  action: string;
+  resource: string;
+  ipAddress: string;
+  userAgent: string;
+  success: boolean;
+  details?: any;
+  timestamp: number;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -10,7 +64,17 @@ export interface User {
   country: string;
   countryCode: string;
   phone: string;
+  permissions: UserPermissions;
+  isActive: boolean;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  twoFactorEnabled: boolean;
+  lastLogin?: number;
+  lastPasswordChange: number;
+  failedLoginAttempts: number;
+  lockedUntil?: number;
   createdAt: number;
+  updatedAt: number;
 }
 
 export interface School {
