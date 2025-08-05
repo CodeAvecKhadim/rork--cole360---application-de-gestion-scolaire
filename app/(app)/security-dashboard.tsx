@@ -1,6 +1,7 @@
 // Tableau de bord de sécurité pour les administrateurs
 // Affiche les logs de sécurité, tentatives de connexion et sessions actives
-import React, { useState } from 'react';
+// Optimisé avec React.memo, useMemo et useCallback pour les performances
+import React, { useState, useMemo, useCallback } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { Stack } from 'expo-router';
 import { COLORS } from '@/constants/colors';
@@ -38,8 +39,8 @@ export default function SecurityDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [showDetails, setShowDetails] = useState<{ [key: string]: boolean }>({});
 
-  // Fonction de rafraîchissement
-  const handleRefresh = async () => {
+  // Fonction de rafraîchissement optimisée avec useCallback
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
       await cleanupOldData();
@@ -48,10 +49,10 @@ export default function SecurityDashboard() {
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [cleanupOldData]);
 
-  // Statistiques de sécurité
-  const getSecurityStats = () => {
+  // Statistiques de sécurité optimisées avec useMemo
+  const stats = useMemo(() => {
     const now = Date.now();
     const last24h = now - (24 * 60 * 60 * 1000);
     const last7d = now - (7 * 24 * 60 * 60 * 1000);
@@ -75,17 +76,15 @@ export default function SecurityDashboard() {
       weeklyFailureRate: weeklyAttempts.length > 0 ? (weeklyFailed.length / weeklyAttempts.length) * 100 : 0,
       suspiciousActivity: failedAttempts.length > 5,
     };
-  };
+  }, [loginAttempts, securityLogs, activeSessions]);
 
-  const stats = getSecurityStats();
-
-  // Fonction pour basculer l'affichage des détails
-  const toggleDetails = (id: string) => {
+  // Fonction pour basculer l'affichage des détails optimisée avec useCallback
+  const toggleDetails = useCallback((id: string) => {
     setShowDetails(prev => ({ ...prev, [id]: !prev[id] }));
-  };
+  }, []);
 
-  // Formatage des dates
-  const formatDate = (timestamp: number) => {
+  // Formatage des dates optimisé avec useCallback
+  const formatDate = useCallback((timestamp: number) => {
     return new Date(timestamp).toLocaleString('fr-FR', {
       day: '2-digit',
       month: '2-digit',
@@ -93,7 +92,7 @@ export default function SecurityDashboard() {
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
+  }, []);
 
   // Rendu de l'onglet Vue d'ensemble
   const renderOverview = () => (
