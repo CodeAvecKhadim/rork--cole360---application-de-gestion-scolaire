@@ -158,7 +158,7 @@ export default function StudentLocationScreen() {
                 <MapPin size={16} color={COLORS.primary} />
                 <Text style={styles.detailLabel}>Position:</Text>
                 <Text style={styles.detailValue}>
-                  {studentLocation.isInSchool ? 'À l&apos;école' : 'Hors école'}
+                  {studentLocation.isInSchool ? 'À l\'école' : 'Hors école'}
                 </Text>
               </View>
               
@@ -220,7 +220,7 @@ export default function StudentLocationScreen() {
           />
           
           <Button
-            title="Voir l&apos;historique"
+            title="Voir l'historique"
             onPress={() => Alert.alert('Historique', 'Fonctionnalité à venir')}
             variant="outline"
             style={styles.actionButton}
