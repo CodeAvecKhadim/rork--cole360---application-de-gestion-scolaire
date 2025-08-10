@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, APP_CONFIG } from '@/constants/colors';
 import { useAuth } from '@/hooks/auth-store';
 import { UserRole } from '@/types/auth';
+import { authService } from '@/services/auth';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import CountryPicker from '@/components/CountryPicker';
@@ -104,7 +105,30 @@ export default function SignUpScreen() {
 
     try {
       setError('');
-      // Préparer les données avec les informations du pays
+      console.log('Tentative d\'inscription avec Firebase...');
+      
+      // Extraire prénom et nom du champ name
+      const nameParts = formData.name.trim().split(' ');
+      const prenom = nameParts[0] || 'Utilisateur';
+      const nom = nameParts.slice(1).join(' ') || 'Nouveau';
+      
+      // Convertir le rôle pour Firebase
+      let firebaseRole: 'admin' | 'prof' | 'parent' = 'parent';
+      if (formData.role === 'teacher') firebaseRole = 'prof';
+      else if (formData.role === 'schoolAdmin') firebaseRole = 'admin';
+      
+      // Créer le compte avec Firebase
+      const user = await authService.signUp(
+        formData.email,
+        formData.password,
+        prenom,
+        nom,
+        firebaseRole
+      );
+      
+      console.log('Inscription Firebase réussie:', user.uid);
+      
+      // Préparer les données avec les informations du pays pour le hook local
       const signupData = {
         ...formData,
         country: formData.country.name,
@@ -112,11 +136,12 @@ export default function SignUpScreen() {
         phone: formData.country.dialCode + formData.phone.replace(/\s/g, ''),
       };
       
+      // Utiliser aussi le hook auth existant pour la gestion d'état locale
       await signup(signupData);
       
       Alert.alert(
         'Compte créé !',
-        'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.',
+        'Votre compte a été créé avec succès dans Firebase et localement. Vous pouvez maintenant vous connecter.',
         [
           {
             text: 'Se connecter',
@@ -125,7 +150,20 @@ export default function SignUpScreen() {
         ]
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Échec de la création du compte');
+      console.error('Erreur d\'inscription:', err);
+      let errorMessage = 'Échec de la création du compte';
+      if (err instanceof Error) {
+        if (err.message.includes('email-already-in-use')) {
+          errorMessage = 'Cette adresse email est déjà utilisée';
+        } else if (err.message.includes('weak-password')) {
+          errorMessage = 'Le mot de passe est trop faible (minimum 6 caractères)';
+        } else if (err.message.includes('invalid-email')) {
+          errorMessage = 'Adresse email invalide';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      setError(errorMessage);
     }
   };
 

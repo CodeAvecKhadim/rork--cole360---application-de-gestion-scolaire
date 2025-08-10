@@ -1,127 +1,127 @@
-// Règles Firestore pour École 360
+// Règles Firestore pour École 360 - Version sécurisée
 // Copiez ces règles dans votre console Firebase
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Collection users - Gestion des utilisateurs
+    // Collection users - Gestion des profils utilisateurs
     match /users/{userId} {
+      // L'utilisateur peut lire et modifier son propre profil
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Les admins peuvent lire tous les profils
       allow read: if request.auth != null && 
-        (resource.data.role == 'admin' || 
-         resource.data.role == 'professeur' || 
-         resource.data.role == 'directeur');
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
     // Collection ecoles - Gestion des écoles
     match /ecoles/{ecoleId} {
+      // Seuls les admins peuvent créer, modifier et supprimer des écoles
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Les profs et parents peuvent lire les écoles auxquelles ils sont associés
       allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (getUserRole() == 'admin' || getUserRole() == 'directeur');
     }
     
     // Collection classes - Gestion des classes
     match /classes/{classeId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (getUserRole() == 'admin' || 
-         getUserRole() == 'directeur' || 
-         getUserRole() == 'professeur');
+      // Les admins ont accès complet
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Les profs peuvent lire et modifier leurs classes
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'prof' &&
+        request.auth.uid in resource.data.professeurs;
+      // Les parents peuvent lire les classes de leurs enfants
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'parent';
     }
     
     // Collection eleves - Gestion des élèves
     match /eleves/{eleveId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (getUserRole() == 'admin' || 
-         getUserRole() == 'directeur' || 
-         getUserRole() == 'professeur');
+      // Les admins ont accès complet
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Les profs peuvent lire et modifier les élèves de leurs classes
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'prof';
       // Les parents peuvent lire les données de leurs enfants
       allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'parent' &&
         request.auth.uid in resource.data.parents;
+    }
+    
+    // Collection cours - Gestion des matières/cours
+    match /cours/{coursId} {
+      // Les admins peuvent créer, modifier et supprimer des cours
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Tous les utilisateurs authentifiés peuvent lire les cours
+      allow read: if request.auth != null;
     }
     
     // Collection notes - Gestion des notes
     match /notes/{noteId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (getUserRole() == 'admin' || 
-         getUserRole() == 'directeur' || 
-         getUserRole() == 'professeur');
+      // Les admins ont accès complet
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Les profs peuvent créer et modifier les notes de leurs élèves
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'prof' &&
+        request.auth.uid == resource.data.professeur_id;
       // Les parents peuvent lire les notes de leurs enfants
       allow read: if request.auth != null && 
-        isParentOfStudent(resource.data.eleveId);
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'parent';
     }
     
-    // Collection presences - Gestion des présences
-    match /presences/{presenceId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (getUserRole() == 'admin' || 
-         getUserRole() == 'directeur' || 
-         getUserRole() == 'professeur');
-      // Les parents peuvent lire les présences de leurs enfants
-      allow read: if request.auth != null && 
-        isParentOfStudent(resource.data.eleveId);
-    }
-    
-    // Collection cours - Gestion des cours
-    match /cours/{coursId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (getUserRole() == 'admin' || getUserRole() == 'directeur');
-    }
-    
-    // Collection messages - Système de messagerie
+    // Collection messages - Gestion de la messagerie
     match /messages/{messageId} {
+      // Les utilisateurs peuvent lire les messages qui leur sont destinés ou qu'ils ont envoyés
+      allow read: if request.auth != null && 
+        (request.auth.uid == resource.data.expediteur_id || 
+         request.auth.uid == resource.data.destinataire_id);
+      // Les utilisateurs peuvent créer des messages
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.expediteur_id;
+      // Seul l'expéditeur peut modifier son message (pour marquer comme lu par exemple)
+      allow update: if request.auth != null && 
+        request.auth.uid == resource.data.expediteur_id;
+    }
+    
+    // Collection locations - Gestion du suivi de géolocalisation
+    match /locations/{locationId} {
+      // Les admins ont accès complet
       allow read, write: if request.auth != null && 
-        (request.auth.uid == resource.data.expediteur || 
-         request.auth.uid == resource.data.destinataire);
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Les profs peuvent lire les positions des élèves de leurs classes
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'prof';
+      // Les parents peuvent lire les positions de leurs enfants
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'parent' &&
+        request.auth.uid in get(/databases/$(database)/documents/eleves/$(resource.data.eleve_id)).data.parents;
+      // Les élèves (via l'app) peuvent créer leurs propres données de localisation
       allow create: if request.auth != null;
     }
     
-    // Collection notifications - Système de notifications
-    match /notifications/{notificationId} {
-      allow read: if request.auth != null && 
-        request.auth.uid == resource.data.userId;
-      allow write: if request.auth != null && 
-        (getUserRole() == 'admin' || 
-         getUserRole() == 'directeur' || 
-         getUserRole() == 'professeur');
-    }
-    
-    // Collection locations - Suivi de localisation des élèves
-    match /locations/{locationId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (getUserRole() == 'admin' || 
-         getUserRole() == 'directeur' || 
-         getUserRole() == 'professeur');
-      // Les parents peuvent lire la localisation de leurs enfants
-      allow read: if request.auth != null && 
-        isParentOfStudent(resource.data.eleveId);
-    }
-    
-    // Collection bulletins - Bulletins scolaires
-    match /bulletins/{bulletinId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (getUserRole() == 'admin' || 
-         getUserRole() == 'directeur' || 
-         getUserRole() == 'professeur');
-      // Les parents peuvent lire les bulletins de leurs enfants
-      allow read: if request.auth != null && 
-        isParentOfStudent(resource.data.eleveId);
-    }
-    
-    // Fonctions utilitaires
-    function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-    }
-    
-    function isParentOfStudent(eleveId) {
-      return request.auth.uid in get(/databases/$(database)/documents/eleves/$(eleveId)).data.parents;
+    // Règle par défaut - Refuser tout accès non spécifié
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

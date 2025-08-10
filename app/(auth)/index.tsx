@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, APP_CONFIG } from '@/constants/colors';
 import { useAuth } from '@/hooks/auth-store';
+import { authService } from '@/services/auth';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import { Eye, EyeOff, Mail, Lock, Chrome } from 'lucide-react-native';
@@ -45,11 +46,34 @@ export default function LoginScreen() {
 
     try {
       setError(''); // Réinitialiser les erreurs
-      await login(email, password, rememberMe); // Tentative de connexion
+      console.log('Tentative de connexion avec Firebase...');
+      
+      // Utiliser le service Firebase pour la connexion
+      const user = await authService.signIn(email, password);
+      console.log('Connexion Firebase réussie:', user.uid);
+      
+      // Utiliser aussi le hook auth existant pour la gestion d'état locale
+      await login(email, password, rememberMe);
+      
       router.replace('/(app)/(tabs)' as any); // Redirection vers l'app principale
     } catch (err) {
+      console.error('Erreur de connexion:', err);
       // Affichage de l'erreur en cas d'échec
-      setError(err instanceof Error ? err.message : 'Échec de la connexion');
+      let errorMessage = 'Échec de la connexion';
+      if (err instanceof Error) {
+        if (err.message.includes('user-not-found')) {
+          errorMessage = 'Aucun compte trouvé avec cette adresse email';
+        } else if (err.message.includes('wrong-password')) {
+          errorMessage = 'Mot de passe incorrect';
+        } else if (err.message.includes('invalid-email')) {
+          errorMessage = 'Adresse email invalide';
+        } else if (err.message.includes('too-many-requests')) {
+          errorMessage = 'Trop de tentatives. Veuillez réessayer plus tard';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      setError(errorMessage);
     }
   };
 
@@ -61,6 +85,49 @@ export default function LoginScreen() {
   // Navigation vers la page d'inscription
   const handleSignUp = () => {
     router.push('/signup' as any);
+  };
+
+  // Fonction pour gérer l'inscription rapide depuis cet écran
+  const handleQuickSignUp = async () => {
+    // Validation des champs obligatoires
+    if (!email || !password) {
+      setError('Veuillez saisir votre email et mot de passe');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Le mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
+
+    try {
+      setError('');
+      console.log('Tentative d\'inscription avec Firebase...');
+      
+      // Créer le compte avec Firebase (rôle parent par défaut)
+      const user = await authService.signUp(email, password, 'Utilisateur', 'Nouveau', 'parent');
+      console.log('Inscription Firebase réussie:', user.uid);
+      
+      // Utiliser aussi le hook auth existant
+      await login(email, password, rememberMe);
+      
+      router.replace('/(app)/(tabs)' as any);
+    } catch (err) {
+      console.error('Erreur d\'inscription:', err);
+      let errorMessage = 'Échec de la création du compte';
+      if (err instanceof Error) {
+        if (err.message.includes('email-already-in-use')) {
+          errorMessage = 'Cette adresse email est déjà utilisée';
+        } else if (err.message.includes('weak-password')) {
+          errorMessage = 'Le mot de passe est trop faible';
+        } else if (err.message.includes('invalid-email')) {
+          errorMessage = 'Adresse email invalide';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      setError(errorMessage);
+    }
   };
 
   return (
@@ -171,7 +238,7 @@ export default function LoginScreen() {
 
               <Button
                 title={isLogin ? "Se connecter" : "S'inscrire"}
-                onPress={isLogin ? handleLogin : handleSignUp}
+                onPress={isLogin ? handleLogin : handleQuickSignUp}
                 loading={loading}
                 style={styles.actionButton}
                 testID={isLogin ? "login-button" : "signup-button"}
