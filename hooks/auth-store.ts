@@ -198,9 +198,13 @@ export const [AuthContext, useAuth] = createContextHook(() => {
           }
           
           // Enregistrer la restauration de session
-          await logSecurityEvent('SESSION_RESTORED', 'authentication', userData.id, true, {
-            sessionId: storedSession
-          });
+          try {
+            await logSecurityEvent('SESSION_RESTORED', 'authentication', userData.id, true, {
+              sessionId: storedSession
+            });
+          } catch (securityError) {
+            console.warn('Failed to log security event:', securityError);
+          }
         }
       } catch (err) {
         console.error('Erreur lors du chargement de l\'utilisateur:', err);
@@ -494,7 +498,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     if (user && !loading && !currentSession) {
       validateSession();
     }
-  }, [user?.id, loading, currentSession]);
+  }, [user?.id, loading]);
   
   // Fonction pour changer le mot de passe
   const changePassword = async (currentPassword: string, newPassword: string) => {

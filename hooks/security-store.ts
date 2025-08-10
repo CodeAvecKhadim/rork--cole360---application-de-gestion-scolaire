@@ -351,7 +351,7 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
   // Nettoyer automatiquement les anciennes données au démarrage
   useEffect(() => {
     cleanupOldData();
-  }, [cleanupOldData]);
+  }, []);
   
   return useMemo(() => ({
     // Données
