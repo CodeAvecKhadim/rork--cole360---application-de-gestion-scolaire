@@ -343,7 +343,7 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
     await AsyncStorage.setItem('securityLogs', JSON.stringify(recentLogs));
     
     // Nettoyer les sessions expirées
-    const activeSessionsFiltered: UserSession[] = activeSessions.filter((session: UserSession) => session.expiresAt > now && session.isActive);
+    const activeSessionsFiltered = activeSessions.filter((session: UserSession) => session.expiresAt > now && session.isActive);
     setActiveSessions(activeSessionsFiltered);
     await AsyncStorage.setItem('activeSessions', JSON.stringify(activeSessionsFiltered));
   };
