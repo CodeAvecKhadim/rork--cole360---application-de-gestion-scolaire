@@ -16,6 +16,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthContext } from "@/hooks/auth-store";
 import { DataContext } from "@/hooks/data-store";
 import { SecurityContext } from "@/hooks/security-store";
+// Import de l'initialisation Firebase
+import "../firebase.ts";
 
 // Empêcher l'écran de démarrage de se cacher automatiquement
 // Cela nous permet de contrôler quand l'écran de démarrage disparaît
@@ -51,6 +53,7 @@ export default function RootLayout() {
     // Cacher l'écran de démarrage une fois l'app chargée
     const hideSplashScreen = async () => {
       try {
+        console.log('🔥 Firebase initialisé avec succès');
         await SplashScreen.hideAsync();
       } catch (error) {
         console.warn('Erreur lors du masquage de l\'écran de démarrage:', error);

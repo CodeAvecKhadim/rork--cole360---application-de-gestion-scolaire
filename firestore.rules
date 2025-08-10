@@ -1,0 +1,127 @@
+// Règles Firestore pour École 360
+// Copiez ces règles dans votre console Firebase
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Collection users - Gestion des utilisateurs
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && 
+        (resource.data.role == 'admin' || 
+         resource.data.role == 'professeur' || 
+         resource.data.role == 'directeur');
+    }
+    
+    // Collection ecoles - Gestion des écoles
+    match /ecoles/{ecoleId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (getUserRole() == 'admin' || getUserRole() == 'directeur');
+    }
+    
+    // Collection classes - Gestion des classes
+    match /classes/{classeId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (getUserRole() == 'admin' || 
+         getUserRole() == 'directeur' || 
+         getUserRole() == 'professeur');
+    }
+    
+    // Collection eleves - Gestion des élèves
+    match /eleves/{eleveId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (getUserRole() == 'admin' || 
+         getUserRole() == 'directeur' || 
+         getUserRole() == 'professeur');
+      // Les parents peuvent lire les données de leurs enfants
+      allow read: if request.auth != null && 
+        request.auth.uid in resource.data.parents;
+    }
+    
+    // Collection notes - Gestion des notes
+    match /notes/{noteId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (getUserRole() == 'admin' || 
+         getUserRole() == 'directeur' || 
+         getUserRole() == 'professeur');
+      // Les parents peuvent lire les notes de leurs enfants
+      allow read: if request.auth != null && 
+        isParentOfStudent(resource.data.eleveId);
+    }
+    
+    // Collection presences - Gestion des présences
+    match /presences/{presenceId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (getUserRole() == 'admin' || 
+         getUserRole() == 'directeur' || 
+         getUserRole() == 'professeur');
+      // Les parents peuvent lire les présences de leurs enfants
+      allow read: if request.auth != null && 
+        isParentOfStudent(resource.data.eleveId);
+    }
+    
+    // Collection cours - Gestion des cours
+    match /cours/{coursId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (getUserRole() == 'admin' || getUserRole() == 'directeur');
+    }
+    
+    // Collection messages - Système de messagerie
+    match /messages/{messageId} {
+      allow read, write: if request.auth != null && 
+        (request.auth.uid == resource.data.expediteur || 
+         request.auth.uid == resource.data.destinataire);
+      allow create: if request.auth != null;
+    }
+    
+    // Collection notifications - Système de notifications
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow write: if request.auth != null && 
+        (getUserRole() == 'admin' || 
+         getUserRole() == 'directeur' || 
+         getUserRole() == 'professeur');
+    }
+    
+    // Collection locations - Suivi de localisation des élèves
+    match /locations/{locationId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (getUserRole() == 'admin' || 
+         getUserRole() == 'directeur' || 
+         getUserRole() == 'professeur');
+      // Les parents peuvent lire la localisation de leurs enfants
+      allow read: if request.auth != null && 
+        isParentOfStudent(resource.data.eleveId);
+    }
+    
+    // Collection bulletins - Bulletins scolaires
+    match /bulletins/{bulletinId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (getUserRole() == 'admin' || 
+         getUserRole() == 'directeur' || 
+         getUserRole() == 'professeur');
+      // Les parents peuvent lire les bulletins de leurs enfants
+      allow read: if request.auth != null && 
+        isParentOfStudent(resource.data.eleveId);
+    }
+    
+    // Fonctions utilitaires
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isParentOfStudent(eleveId) {
+      return request.auth.uid in get(/databases/$(database)/documents/eleves/$(eleveId)).data.parents;
+    }
+  }
+}

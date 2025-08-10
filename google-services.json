@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "914223114395",
+    "project_id": "ecole-360---rork-fix",
+    "storage_bucket": "ecole-360---rork-fix.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914223114395:android:94b3dbb69cb032e1513e3e",
+        "android_client_info": {
+          "package_name": "com.ecole360.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYKFEXa5KKJtViWjFRXsjGzk2BCx6IvVw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
