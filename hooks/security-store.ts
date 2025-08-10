@@ -2,7 +2,7 @@
 // Gère les permissions, sessions, tentatives de connexion et logs de sécurité
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Platform } from 'react-native';
 import { UserRole, UserPermissions, UserSession, LoginAttempt, SecurityLog } from '@/types/auth';
 
@@ -178,7 +178,7 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
   }, []);
   
   // Enregistrer une tentative de connexion
-  const logLoginAttempt = async (email: string, success: boolean, failureReason?: string) => {
+  const logLoginAttempt = useCallback(async (email: string, success: boolean, failureReason?: string) => {
     const ipAddress = await SecurityUtils.getIPAddress();
     const { userAgent } = SecurityUtils.getDeviceInfo();
     
@@ -205,10 +205,10 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
       ipAddress,
       timestamp: new Date(attempt.timestamp).toISOString()
     });
-  };
+  }, [loginAttempts]);
   
   // Enregistrer un log de sécurité
-  const logSecurityEvent = async (action: string, resource: string, userId?: string, success: boolean = true, details?: any) => {
+  const logSecurityEvent = useCallback(async (action: string, resource: string, userId?: string, success: boolean = true, details?: any) => {
     const ipAddress = await SecurityUtils.getIPAddress();
     const { userAgent } = SecurityUtils.getDeviceInfo();
     
@@ -238,10 +238,10 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
       success,
       timestamp: new Date(log.timestamp).toISOString()
     });
-  };
+  }, [securityLogs]);
   
   // Créer une nouvelle session
-  const createSession = async (userId: string): Promise<UserSession> => {
+  const createSession = useCallback(async (userId: string): Promise<UserSession> => {
     const ipAddress = await SecurityUtils.getIPAddress();
     const { name: deviceName, userAgent } = SecurityUtils.getDeviceInfo();
     
@@ -269,10 +269,10 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
     });
     
     return session;
-  };
+  }, [activeSessions, deviceId, logSecurityEvent]);
   
   // Terminer une session
-  const terminateSession = async (sessionId: string, userId?: string) => {
+  const terminateSession = useCallback(async (sessionId: string, userId?: string) => {
     const updatedSessions = activeSessions.map(session => 
       session.id === sessionId 
         ? { ...session, isActive: false }
@@ -285,10 +285,10 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
     await logSecurityEvent('SESSION_TERMINATED', 'user_session', userId, true, {
       sessionId
     });
-  };
+  }, [activeSessions, logSecurityEvent]);
   
   // Vérifier si un utilisateur est verrouillé
-  const isUserLocked = (email: string): boolean => {
+  const isUserLocked = useCallback((email: string): boolean => {
     const now = Date.now();
     const recentAttempts = loginAttempts.filter(
       attempt => 
@@ -298,10 +298,10 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
     );
     
     return recentAttempts.length >= SECURITY_CONFIG.MAX_LOGIN_ATTEMPTS;
-  };
+  }, [loginAttempts]);
   
   // Obtenir le temps restant de verrouillage
-  const getLockoutTimeRemaining = (email: string): number => {
+  const getLockoutTimeRemaining = useCallback((email: string): number => {
     const now = Date.now();
     const recentFailedAttempts = loginAttempts
       .filter(attempt => attempt.email === email && !attempt.success)
@@ -314,21 +314,21 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
     }
     
     return 0;
-  };
+  }, [loginAttempts]);
   
   // Obtenir les permissions pour un rôle
-  const getPermissionsForRole = (role: UserRole): UserPermissions => {
+  const getPermissionsForRole = useCallback((role: UserRole): UserPermissions => {
     return ROLE_PERMISSIONS[role];
-  };
+  }, []);
   
   // Vérifier une permission spécifique
-  const hasPermission = (userRole: UserRole, permission: keyof UserPermissions): boolean => {
+  const hasPermission = useCallback((userRole: UserRole, permission: keyof UserPermissions): boolean => {
     const permissions = getPermissionsForRole(userRole);
     return permissions[permission];
-  };
+  }, [getPermissionsForRole]);
   
   // Nettoyer les anciennes données
-  const cleanupOldData = async () => {
+  const cleanupOldData = useCallback(async () => {
     const now = Date.now();
     const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
     
@@ -346,14 +346,14 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
     const activeSessionsFiltered = activeSessions.filter((session: UserSession) => session.expiresAt > now && session.isActive);
     setActiveSessions(activeSessionsFiltered);
     await AsyncStorage.setItem('activeSessions', JSON.stringify(activeSessionsFiltered));
-  };
+  }, [loginAttempts, securityLogs, activeSessions]);
   
   // Nettoyer automatiquement les anciennes données au démarrage
   useEffect(() => {
     cleanupOldData();
-  }, []);
+  }, [cleanupOldData]);
   
-  return {
+  return useMemo(() => ({
     // Données
     loginAttempts,
     securityLogs,
@@ -374,7 +374,21 @@ export const [SecurityContext, useSecurity] = createContextHook(() => {
     // Utilitaires
     SecurityUtils,
     SECURITY_CONFIG,
-  };
+  }), [
+    loginAttempts,
+    securityLogs,
+    activeSessions,
+    deviceId,
+    logLoginAttempt,
+    logSecurityEvent,
+    createSession,
+    terminateSession,
+    isUserLocked,
+    getLockoutTimeRemaining,
+    getPermissionsForRole,
+    hasPermission,
+    cleanupOldData,
+  ]);
 });
 
 // Hook pour vérifier les permissions
