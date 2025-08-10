@@ -148,7 +148,7 @@ export default function StudentLocationScreen() {
               title={student.locationEnabled ? 'Désactiver' : 'Activer'}
               onPress={handleToggleTracking}
               variant={student.locationEnabled ? 'secondary' : 'primary'}
-              size=\"small\"
+              size="small"
             />
           </View>
 
@@ -158,7 +158,7 @@ export default function StudentLocationScreen() {
                 <MapPin size={16} color={COLORS.primary} />
                 <Text style={styles.detailLabel}>Position:</Text>
                 <Text style={styles.detailValue}>
-                  {studentLocation.isInSchool ? 'À l\'école' : 'Hors école'}
+                  {studentLocation.isInSchool ? 'À l&apos;école' : 'Hors école'}
                 </Text>
               </View>
               
@@ -212,17 +212,17 @@ export default function StudentLocationScreen() {
         {/* Actions */}
         <View style={styles.actionsContainer}>
           <Button
-            title=\"Actualiser la position\"
+            title="Actualiser la position"
             onPress={handleRefreshLocation}
-            variant=\"primary\"
+            variant="primary"
             loading={refreshing}
             style={styles.actionButton}
           />
           
           <Button
-            title=\"Voir l'historique\"
+            title="Voir l&apos;historique"
             onPress={() => Alert.alert('Historique', 'Fonctionnalité à venir')}
-            variant=\"outline\"
+            variant="outline"
             style={styles.actionButton}
           />
         </View>
@@ -254,7 +254,7 @@ export default function StudentLocationScreen() {
         {/* Emergency Contacts */}
         {student.emergencyContacts.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Contacts d'urgence</Text>
+            <Text style={styles.sectionTitle}>Contacts d&apos;urgence</Text>
             {student.emergencyContacts.map((contact) => (
               <TouchableOpacity
                 key={contact.id}
