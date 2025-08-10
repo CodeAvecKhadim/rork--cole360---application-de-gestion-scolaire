@@ -2,7 +2,7 @@
 // Ce fichier définit la navigation par onglets avec des permissions basées sur les rôles
 import { Tabs } from "expo-router";
 import React from "react";
-import { Home, User, Book, School, MessageSquare } from "lucide-react-native";
+import { Home, User, Book, School, MessageSquare, MapPin } from "lucide-react-native";
 import { COLORS } from "@/constants/colors";
 import { useAuth } from "@/hooks/auth-store";
 
@@ -60,6 +60,17 @@ export default function TabLayout() {
           options={{
             title: "Élèves",
             tabBarIcon: ({ color }) => <User size={24} color={color} />,
+          }}
+        />
+      )}
+
+      {/* Onglet Localisation - Visible uniquement pour les parents */}
+      {role === "parent" && (
+        <Tabs.Screen
+          name="location"
+          options={{
+            title: "Localisation",
+            tabBarIcon: ({ color }) => <MapPin size={24} color={color} />,
           }}
         />
       )}

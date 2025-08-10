@@ -1,6 +1,6 @@
 import createContextHook from '@nkzw/create-context-hook';
 import { useState } from 'react';
-import { School, Class, Student, Grade, Attendance, Message, Notification } from '@/types/auth';
+import { School, Class, Student, Grade, Attendance, Message, Notification, StudentLocation, LocationAlert, SafeZone, EmergencyContact } from '@/types/auth';
 
 // Mock data for demo purposes
 const mockSchools: School[] = [
@@ -62,6 +62,35 @@ const mockStudents: Student[] = [
     schoolId: '1',
     classId: '1',
     parentId: '4',
+    locationEnabled: true,
+    lastLocation: {
+      id: '1',
+      studentId: '1',
+      latitude: 48.8566,
+      longitude: 2.3522,
+      accuracy: 10,
+      timestamp: Date.now() - 5 * 60 * 1000, // 5 minutes ago
+      address: 'École Centrale, 123 Education St, Paris',
+      isInSchool: true,
+      batteryLevel: 85,
+      deviceId: 'device_alex_001',
+    },
+    emergencyContacts: [
+      {
+        id: '1',
+        name: 'Marie Johnson',
+        phone: '+33123456789',
+        relationship: 'Mère',
+        isPrimary: true,
+      },
+      {
+        id: '2',
+        name: 'Pierre Johnson',
+        phone: '+33987654321',
+        relationship: 'Père',
+        isPrimary: false,
+      },
+    ],
     createdAt: Date.now(),
   },
   {
@@ -70,6 +99,16 @@ const mockStudents: Student[] = [
     schoolId: '1',
     classId: '1',
     parentId: '4',
+    locationEnabled: false,
+    emergencyContacts: [
+      {
+        id: '3',
+        name: 'Sarah Wilson',
+        phone: '+33555666777',
+        relationship: 'Mère',
+        isPrimary: true,
+      },
+    ],
     createdAt: Date.now(),
   },
 ];
@@ -161,6 +200,57 @@ const mockMessages: Message[] = [
   },
 ];
 
+const mockLocationAlerts: LocationAlert[] = [
+  {
+    id: '1',
+    studentId: '1',
+    parentId: '4',
+    type: 'left_school',
+    message: 'Alex Johnson a quitté l\'école à 15:30',
+    location: {
+      latitude: 48.8566,
+      longitude: 2.3522,
+      address: 'École Centrale, 123 Education St, Paris',
+    },
+    acknowledged: false,
+    createdAt: Date.now() - 30 * 60 * 1000, // 30 minutes ago
+  },
+  {
+    id: '2',
+    studentId: '1',
+    parentId: '4',
+    type: 'low_battery',
+    message: 'Le téléphone d\'Alex Johnson a une batterie faible (15%)',
+    acknowledged: true,
+    createdAt: Date.now() - 2 * 60 * 60 * 1000, // 2 hours ago
+  },
+];
+
+const mockSafeZones: SafeZone[] = [
+  {
+    id: '1',
+    studentId: '1',
+    name: 'École',
+    latitude: 48.8566,
+    longitude: 2.3522,
+    radius: 100,
+    isActive: true,
+    notifications: true,
+    createdAt: Date.now(),
+  },
+  {
+    id: '2',
+    studentId: '1',
+    name: 'Maison',
+    latitude: 48.8606,
+    longitude: 2.3376,
+    radius: 50,
+    isActive: true,
+    notifications: true,
+    createdAt: Date.now(),
+  },
+];
+
 const mockNotifications: Notification[] = [
   {
     id: '1',
@@ -188,6 +278,9 @@ export const [DataContext, useData] = createContextHook(() => {
   const [attendance, setAttendance] = useState<Attendance[]>(mockAttendance);
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [locationAlerts, setLocationAlerts] = useState<LocationAlert[]>(mockLocationAlerts);
+  const [safeZones, setSafeZones] = useState<SafeZone[]>(mockSafeZones);
+  const [studentLocations, setStudentLocations] = useState<StudentLocation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   // School methods
@@ -310,6 +403,97 @@ export const [DataContext, useData] = createContextHook(() => {
     return newNotification;
   };
 
+  // Location methods
+  const updateStudentLocation = (location: Omit<StudentLocation, 'id'>) => {
+    const newLocation: StudentLocation = {
+      ...location,
+      id: Date.now().toString(),
+    };
+    
+    // Update student's last location
+    setStudents(students.map(s => 
+      s.id === location.studentId 
+        ? { ...s, lastLocation: newLocation }
+        : s
+    ));
+    
+    // Add to locations history
+    setStudentLocations(prev => [newLocation, ...prev.slice(0, 99)]); // Keep last 100 locations
+    
+    return newLocation;
+  };
+
+  const getStudentLocation = (studentId: string) => {
+    const student = students.find(s => s.id === studentId);
+    return student?.lastLocation;
+  };
+
+  const toggleStudentLocationTracking = (studentId: string, enabled: boolean) => {
+    setStudents(students.map(s => 
+      s.id === studentId 
+        ? { ...s, locationEnabled: enabled }
+        : s
+    ));
+  };
+
+  // Location alerts methods
+  const getLocationAlerts = (parentId: string) => 
+    locationAlerts.filter(alert => alert.parentId === parentId)
+      .sort((a, b) => b.createdAt - a.createdAt);
+
+  const getUnacknowledgedAlertsCount = (parentId: string) => 
+    locationAlerts.filter(alert => alert.parentId === parentId && !alert.acknowledged).length;
+
+  const acknowledgeLocationAlert = (alertId: string) => {
+    setLocationAlerts(alerts => alerts.map(alert => 
+      alert.id === alertId ? { ...alert, acknowledged: true } : alert
+    ));
+  };
+
+  const addLocationAlert = (alert: Omit<LocationAlert, 'id' | 'createdAt' | 'acknowledged'>) => {
+    const newAlert: LocationAlert = {
+      ...alert,
+      id: Date.now().toString(),
+      acknowledged: false,
+      createdAt: Date.now(),
+    };
+    setLocationAlerts(prev => [newAlert, ...prev]);
+    return newAlert;
+  };
+
+  // Safe zones methods
+  const getSafeZonesByStudent = (studentId: string) => 
+    safeZones.filter(zone => zone.studentId === studentId);
+
+  const addSafeZone = (zone: Omit<SafeZone, 'id' | 'createdAt'>) => {
+    const newZone: SafeZone = {
+      ...zone,
+      id: Date.now().toString(),
+      createdAt: Date.now(),
+    };
+    setSafeZones(prev => [...prev, newZone]);
+    return newZone;
+  };
+
+  const updateSafeZone = (zoneId: string, updates: Partial<SafeZone>) => {
+    setSafeZones(zones => zones.map(zone => 
+      zone.id === zoneId ? { ...zone, ...updates } : zone
+    ));
+  };
+
+  const deleteSafeZone = (zoneId: string) => {
+    setSafeZones(zones => zones.filter(zone => zone.id !== zoneId));
+  };
+
+  // Emergency contacts methods
+  const updateEmergencyContacts = (studentId: string, contacts: EmergencyContact[]) => {
+    setStudents(students.map(s => 
+      s.id === studentId 
+        ? { ...s, emergencyContacts: contacts }
+        : s
+    ));
+  };
+
   return {
     loading,
     // School methods
@@ -356,5 +540,28 @@ export const [DataContext, useData] = createContextHook(() => {
     getUnreadNotificationsCount,
     markNotificationAsRead,
     addNotification,
+    
+    // Location methods
+    studentLocations,
+    updateStudentLocation,
+    getStudentLocation,
+    toggleStudentLocationTracking,
+    
+    // Location alerts methods
+    locationAlerts,
+    getLocationAlerts,
+    getUnacknowledgedAlertsCount,
+    acknowledgeLocationAlert,
+    addLocationAlert,
+    
+    // Safe zones methods
+    safeZones,
+    getSafeZonesByStudent,
+    addSafeZone,
+    updateSafeZone,
+    deleteSafeZone,
+    
+    // Emergency contacts methods
+    updateEmergencyContacts,
   };
 });

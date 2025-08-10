@@ -9,6 +9,7 @@ export const COLORS = {
   // Couleurs d'état (feedback utilisateur)
   success: "#4CAF50", // Vert - pour les messages de succès
   warning: "#FFC107", // Jaune/Orange - pour les avertissements
+  warningLight: "#FFF3CD", // Version claire du warning
   danger: "#F44336", // Rouge - pour les erreurs et actions destructives
   info: "#2196F3", // Bleu clair - pour les informations
   error: "#F44336", // Rouge - alias pour danger (cohérence)

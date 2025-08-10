@@ -104,6 +104,57 @@ export interface Student {
   schoolId: string;
   classId: string;
   parentId: string;
+  locationEnabled: boolean;
+  lastLocation?: StudentLocation;
+  emergencyContacts: EmergencyContact[];
+  createdAt: number;
+}
+
+export interface StudentLocation {
+  id: string;
+  studentId: string;
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: number;
+  address?: string;
+  isInSchool: boolean;
+  batteryLevel?: number;
+  deviceId: string;
+}
+
+export interface EmergencyContact {
+  id: string;
+  name: string;
+  phone: string;
+  relationship: string;
+  isPrimary: boolean;
+}
+
+export interface LocationAlert {
+  id: string;
+  studentId: string;
+  parentId: string;
+  type: 'left_school' | 'arrived_school' | 'emergency' | 'low_battery' | 'location_disabled';
+  message: string;
+  location?: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
+  acknowledged: boolean;
+  createdAt: number;
+}
+
+export interface SafeZone {
+  id: string;
+  studentId: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  radius: number; // in meters
+  isActive: boolean;
+  notifications: boolean;
   createdAt: number;
 }
 
