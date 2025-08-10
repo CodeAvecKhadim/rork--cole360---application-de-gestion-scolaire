@@ -30,15 +30,18 @@ export default function ConversationScreen() {
 
   // Mark unread messages as read
   useEffect(() => {
-    if (user) {
-      const messagesToMarkAsRead = messages.filter(
-        message => message.receiverId === user.id && !message.read
-      );
-      messagesToMarkAsRead.forEach(message => {
-        markMessageAsRead(message.id);
-      });
-    }
-  }, [user, markMessageAsRead]);
+    if (!user?.id) return;
+
+    const messagesToMarkAsRead = messages.filter(
+      (message) => message.receiverId === user.id && !message.read
+    );
+
+    if (messagesToMarkAsRead.length === 0) return;
+
+    messagesToMarkAsRead.forEach((message) => {
+      markMessageAsRead(message.id);
+    });
+  }, [user?.id, messages.length]);
 
   const getPartnerName = (partnerId: string) => {
     // In a real app, you would fetch the user name from a users collection

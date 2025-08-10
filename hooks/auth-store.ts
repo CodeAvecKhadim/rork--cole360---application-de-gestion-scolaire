@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { User, UserRole, UserPermissions } from '@/types/auth';
 import { useSecurity } from '@/hooks/security-store';
 
@@ -464,7 +464,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     }
   };
 
-  const getRememberedEmail = async () => {
+  const getRememberedEmail = useCallback(async () => {
     try {
       const rememberMe = await AsyncStorage.getItem('rememberMe');
       if (rememberMe === 'true') {
@@ -475,7 +475,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
       console.error('Failed to get remembered email', err);
       return null;
     }
-  };
+  }, []);
 
   // Vérifier la validité de la session au chargement
   useEffect(() => {
@@ -498,7 +498,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     if (user && !loading && !currentSession) {
       validateSession();
     }
-  }, [user?.id, loading]);
+  }, [user?.id, loading, currentSession, logSecurityEvent, user]);
   
   // Fonction pour changer le mot de passe
   const changePassword = async (currentPassword: string, newPassword: string) => {

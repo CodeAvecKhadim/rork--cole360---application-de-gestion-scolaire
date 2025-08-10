@@ -16,39 +16,37 @@ export default function MessagesScreen() {
   const [conversations, setConversations] = useState<any[]>([]);
 
   useEffect(() => {
-    if (user) {
-      const messages = getMessagesByUser(user.id);
-      
-      // Group messages by conversation partner
-      const conversationMap = new Map();
-      
-      messages.forEach(message => {
-        const partnerId = message.senderId === user.id ? message.receiverId : message.senderId;
-        
-        if (!conversationMap.has(partnerId)) {
-          conversationMap.set(partnerId, {
-            id: partnerId,
-            lastMessage: message,
-            unreadCount: message.receiverId === user.id && !message.read ? 1 : 0,
-          });
-        } else {
-          const conversation = conversationMap.get(partnerId);
-          if (message.createdAt > conversation.lastMessage.createdAt) {
-            conversation.lastMessage = message;
-          }
-          if (message.receiverId === user.id && !message.read) {
-            conversation.unreadCount += 1;
-          }
-        }
-      });
-      
-      // Convert map to array and sort by last message time
-      const conversationsArray = Array.from(conversationMap.values());
-      conversationsArray.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
-      
-      setConversations(conversationsArray);
+    if (!user?.id) {
+      setConversations([]);
+      return;
     }
-  }, [user, getMessagesByUser]);
+
+    const msgs = getMessagesByUser(user.id);
+    const conversationMap = new Map<string, any>();
+
+    msgs.forEach((message) => {
+      const partnerId = message.senderId === user.id ? message.receiverId : message.senderId;
+      if (!conversationMap.has(partnerId)) {
+        conversationMap.set(partnerId, {
+          id: partnerId,
+          lastMessage: message,
+          unreadCount: message.receiverId === user.id && !message.read ? 1 : 0,
+        });
+      } else {
+        const conversation = conversationMap.get(partnerId);
+        if (message.createdAt > conversation.lastMessage.createdAt) {
+          conversation.lastMessage = message;
+        }
+        if (message.receiverId === user.id && !message.read) {
+          conversation.unreadCount += 1;
+        }
+      }
+    });
+
+    const conversationsArray = Array.from(conversationMap.values());
+    conversationsArray.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
+    setConversations(conversationsArray);
+  }, [user?.id]);
 
   const getPartnerName = (partnerId: string) => {
     // In a real app, you would fetch the user name from a users collection
