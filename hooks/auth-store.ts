@@ -478,7 +478,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     const validateSession = async () => {
       try {
         const storedSession = await AsyncStorage.getItem('currentSession');
-        if (storedSession && user) {
+        if (storedSession && user && !currentSession) {
           setCurrentSession(storedSession);
           
           // En production, vous vérifieriez la validité de la session côté serveur
@@ -491,10 +491,10 @@ export const [AuthContext, useAuth] = createContextHook(() => {
       }
     };
     
-    if (user && !loading) {
+    if (user && !loading && !currentSession) {
       validateSession();
     }
-  }, [user, loading]);
+  }, [user?.id, loading, currentSession]);
   
   // Fonction pour changer le mot de passe
   const changePassword = async (currentPassword: string, newPassword: string) => {
