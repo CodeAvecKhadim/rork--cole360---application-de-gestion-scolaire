@@ -4,12 +4,12 @@ import { getFirestore, type Firestore } from 'firebase/firestore';
 
 // Configuration Firebase basée sur votre google-services.json et GoogleService-Info.plist
 const firebaseConfig = {
-  apiKey: "AIzaSyCYKFEXa5KKJtViWjFRXsjGzk2BCx6IvVw",
+  apiKey: "AIzaSyCdKZPLeJxepR3fiJkMktmBCoVTmYMoKjM",
   authDomain: "ecole-360---rork-fix.firebaseapp.com",
   projectId: "ecole-360---rork-fix",
   storageBucket: "ecole-360---rork-fix.firebasestorage.app",
   messagingSenderId: "914223114395",
-  appId: "1:914223114395:android:94b3dbb69cb032e1513e3e"
+  appId: "1:914223114395:ios:3b6953077b82f6da513e3e"
 };
 
 // Initialiser Firebase
@@ -22,9 +22,38 @@ const auth: Auth = getAuth(app);
 const db: Firestore = getFirestore(app);
 
 // Vérifier la connexion Firebase
-console.log('Firebase initialisé avec succès');
-console.log('Project ID:', firebaseConfig.projectId);
-console.log('Auth Domain:', firebaseConfig.authDomain);
+console.log('🔥 Firebase initialisé avec succès');
+console.log('📋 Project ID:', firebaseConfig.projectId);
+console.log('🌐 Auth Domain:', firebaseConfig.authDomain);
+console.log('🔑 API Key:', firebaseConfig.apiKey.substring(0, 10) + '...');
+console.log('📱 App ID:', firebaseConfig.appId);
+
+// Test de connexion Firebase
+export const testFirebaseConnection = async () => {
+  try {
+    console.log('🧪 Test de connexion Firebase...');
+    
+    // Test de l'authentification
+    const currentUser = auth.currentUser;
+    console.log('👤 Utilisateur actuel:', currentUser ? currentUser.uid : 'Aucun');
+    
+    // Test de Firestore
+    console.log('🗄️ Firestore connecté');
+    
+    return {
+      auth: !!auth,
+      firestore: !!db,
+      currentUser: currentUser?.uid || null,
+      config: {
+        projectId: firebaseConfig.projectId,
+        authDomain: firebaseConfig.authDomain
+      }
+    };
+  } catch (error) {
+    console.error('❌ Erreur de test Firebase:', error);
+    return { error: error instanceof Error ? error.message : 'Erreur inconnue' };
+  }
+};
 
 export { auth, db };
 export default app;

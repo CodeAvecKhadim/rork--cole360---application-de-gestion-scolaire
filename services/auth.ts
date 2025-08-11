@@ -47,19 +47,15 @@ export const authService = {
     }
   },
 
-  // Vérifier si un utilisateur existe
+  // Vérifier si un utilisateur existe (méthode alternative sans tentative de connexion)
   async checkUserExists(email: string): Promise<boolean> {
     try {
-      // Tenter une connexion avec un mot de passe incorrect pour vérifier l'existence
-      await signInWithEmailAndPassword(auth, email, 'test-password-incorrect');
-      return true;
+      // Utiliser fetchSignInMethodsForEmail pour vérifier l'existence sans tentative de connexion
+      const { fetchSignInMethodsForEmail } = await import('firebase/auth');
+      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+      return signInMethods.length > 0;
     } catch (error: any) {
-      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        return true; // L'utilisateur existe mais le mot de passe est incorrect
-      }
-      if (error.code === 'auth/user-not-found') {
-        return false; // L'utilisateur n'existe pas
-      }
+      console.log('Erreur lors de la vérification de l\'utilisateur:', error.code);
       return false;
     }
   },

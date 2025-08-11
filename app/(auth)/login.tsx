@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, APP_CONFIG } from '@/constants/colors';
 import { useAuth } from '@/hooks/auth-store';
 import { authService } from '@/services/auth';
+import { testFirebaseConnection } from '@/libs/firebase';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import { Eye, EyeOff, Mail, Lock, Chrome } from 'lucide-react-native';
@@ -35,6 +36,13 @@ export default function LoginScreen() {
       }
     };
     loadRememberedEmail();
+    
+    // Test de connexion Firebase au démarrage
+    const testConnection = async () => {
+      const result = await testFirebaseConnection();
+      console.log('🔍 Résultat du test Firebase:', result);
+    };
+    testConnection();
   }, [getRememberedEmail]);
 
   // Fonction pour créer les comptes de démonstration
@@ -62,20 +70,37 @@ export default function LoginScreen() {
       return;
     }
 
+    // Validation de l'email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('❌ Format d\'email invalide');
+      return;
+    }
+
     try {
       setError(''); // Réinitialiser les erreurs
       console.log('Tentative de connexion avec Firebase...');
+      console.log('Email:', email);
+      console.log('Firebase config check:', {
+        projectId: 'ecole-360---rork-fix',
+        authDomain: 'ecole-360---rork-fix.firebaseapp.com'
+      });
       
       // Utiliser le service Firebase pour la connexion
-      const user = await authService.signIn(email, password);
+      const user = await authService.signIn(email.trim().toLowerCase(), password);
       console.log('Connexion Firebase réussie:', user.uid);
       
       // Utiliser aussi le hook auth existant pour la gestion d'état locale
-      await login(email, password, rememberMe);
+      await login(email.trim().toLowerCase(), password, rememberMe);
       
       router.replace('/(app)/(tabs)/dashboard' as any); // Redirection vers l'app principale
     } catch (err: any) {
-      console.error('Erreur de connexion:', err);
+      console.error('Erreur de connexion complète:', {
+        code: err.code,
+        message: err.message,
+        stack: err.stack
+      });
+      
       // Affichage de l'erreur en cas d'échec
       let errorMessage = 'Échec de la connexion';
       
@@ -86,7 +111,7 @@ export default function LoginScreen() {
             break;
           case 'auth/wrong-password':
           case 'auth/invalid-credential':
-            errorMessage = '❌ Email ou mot de passe incorrect. Vérifiez vos identifiants.';
+            errorMessage = '❌ Email ou mot de passe incorrect. Vérifiez vos identifiants ou créez les comptes de démonstration.';
             break;
           case 'auth/invalid-email':
             errorMessage = '❌ Adresse email invalide';
@@ -97,8 +122,12 @@ export default function LoginScreen() {
           case 'auth/network-request-failed':
             errorMessage = '❌ Erreur de connexion réseau. Vérifiez votre connexion internet.';
             break;
+          case 'auth/configuration-not-found':
+          case 'auth/project-not-found':
+            errorMessage = '❌ Configuration Firebase incorrecte. Contactez l\'administrateur.';
+            break;
           default:
-            errorMessage = `❌ Erreur: ${err.message}`;
+            errorMessage = `❌ Erreur Firebase (${err.code}): ${err.message}`;
         }
       } else if (err.message) {
         errorMessage = `❌ ${err.message}`;
