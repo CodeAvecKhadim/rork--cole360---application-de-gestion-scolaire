@@ -17,7 +17,7 @@ import { AuthContext } from "@/hooks/auth-store";
 import { DataContext } from "@/hooks/data-store";
 import { SecurityContext } from "@/hooks/security-store";
 // Import de l'initialisation Firebase
-import "../firebase.ts";
+import "@/libs/firebase";
 
 // Empêcher l'écran de démarrage de se cacher automatiquement
 // Cela nous permet de contrôler quand l'écran de démarrage disparaît

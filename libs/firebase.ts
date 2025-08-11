@@ -1,4 +1,4 @@
-import { initializeApp, type FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 
@@ -12,8 +12,8 @@ const firebaseConfig = {
   appId: "1:914223114395:ios:3b6953077b82f6da513e3e"
 };
 
-// Initialiser Firebase
-const app: FirebaseApp = initializeApp(firebaseConfig);
+// Initialiser Firebase seulement s'il n'est pas déjà initialisé
+const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 // Initialiser Auth
 const auth: Auth = getAuth(app);

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { User, UserRole, UserPermissions } from '@/types/auth';
 import { useSecurity } from '@/hooks/security-store';
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
@@ -188,7 +188,11 @@ export const [AuthContext, useAuth] = createContextHook(() => {
 
   // Écouter les changements d'état d'authentification Firebase
   useEffect(() => {
+    let isMounted = true;
+    
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
+      if (!isMounted) return;
+      
       try {
         if (firebaseUser) {
           console.log('Firebase user connecté:', firebaseUser.uid);
@@ -196,7 +200,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
           // Récupérer le profil utilisateur depuis Firestore
           const userProfile = await authService.getUserProfile(firebaseUser.uid);
           
-          if (userProfile) {
+          if (userProfile && isMounted) {
             // Convertir le profil Firebase vers le format local
             const localUser: User = {
               id: userProfile.uid,
@@ -227,31 +231,40 @@ export const [AuthContext, useAuth] = createContextHook(() => {
             
             // Créer une session locale
             const session = await createSession(localUser.id);
-            setCurrentSession(session.id);
-            await AsyncStorage.setItem('currentSession', session.id);
-            
-            await logSecurityEvent('FIREBASE_SESSION_RESTORED', 'authentication', localUser.id, true, {
-              firebaseUid: firebaseUser.uid
-            });
+            if (isMounted) {
+              setCurrentSession(session.id);
+              await AsyncStorage.setItem('currentSession', session.id);
+              
+              await logSecurityEvent('FIREBASE_SESSION_RESTORED', 'authentication', localUser.id, true, {
+                firebaseUid: firebaseUser.uid
+              });
+            }
           }
         } else {
           console.log('Firebase user déconnecté');
-          // Nettoyer l'état local quand Firebase se déconnecte
-          setUser(null);
-          setCurrentSession(null);
-          await AsyncStorage.multiRemove(['user', 'currentSession']);
+          if (isMounted) {
+            // Nettoyer l'état local quand Firebase se déconnecte
+            setUser(null);
+            setCurrentSession(null);
+            await AsyncStorage.multiRemove(['user', 'currentSession']);
+          }
         }
       } catch (error) {
         console.error('Erreur lors de la synchronisation Firebase:', error);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, [createSession, logSecurityEvent]);
 
-  const login = async (email: string, password: string, rememberMe: boolean = false) => {
+  const login = useCallback(async (email: string, password: string, rememberMe: boolean = false) => {
     try {
       setLoading(true);
       setError(null);
@@ -342,9 +355,9 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isUserLocked, getLockoutTimeRemaining, logLoginAttempt, createSession, logSecurityEvent, SecurityUtils]);
 
-  const signup = async (formData: {
+  const signup = useCallback(async (formData: {
     name: string;
     email: string;
     password: string;
@@ -433,9 +446,9 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [SecurityUtils, logSecurityEvent]);
 
-  const resetPassword = async (email: string) => {
+  const resetPassword = useCallback(async (email: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -462,9 +475,9 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -498,7 +511,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentSession, user, terminateSession, logSecurityEvent]);
 
   const getRememberedEmail = useCallback(async () => {
     try {
@@ -537,7 +550,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
   }, [user?.id, loading, currentSession, logSecurityEvent, user]);
   
   // Fonction pour changer le mot de passe
-  const changePassword = async (currentPassword: string, newPassword: string) => {
+  const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
     if (!user) {
       throw new Error('Utilisateur non connecté');
     }
@@ -584,9 +597,9 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, SecurityUtils, logSecurityEvent]);
   
-  return {
+  return useMemo(() => ({
     // États
     user,
     loading,
@@ -608,5 +621,5 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     },
     getUserRole: () => user?.role,
     getUserPermissions: () => user?.permissions,
-  };
+  }), [user, loading, error, currentSession, login, signup, resetPassword, logout, changePassword, getRememberedEmail]);
 });
