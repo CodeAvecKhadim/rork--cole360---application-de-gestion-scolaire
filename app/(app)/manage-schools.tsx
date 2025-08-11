@@ -74,6 +74,8 @@ export default function ManageSchoolsScreen() {
       <Stack.Screen 
         options={{ 
           title: 'Gestion des écoles',
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
           headerRight: () => (
             <TouchableOpacity 
               onPress={() => setShowAddForm(!showAddForm)}

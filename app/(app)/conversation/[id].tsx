@@ -90,6 +90,8 @@ export default function ConversationScreen() {
         options={{ 
           title: getPartnerName(partnerId),
           headerTitleStyle: styles.headerTitle,
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
         }} 
       />
       <KeyboardAvoidingView
