@@ -3,7 +3,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
-import { Home, User, Book, School, MessageSquare, MapPin } from "lucide-react-native";
+import { Home, Book, School, MessageSquare, MapPin, Users, GraduationCap } from "lucide-react-native";
 import { COLORS } from "@/constants/colors";
 import { useAuth } from "@/hooks/auth-store";
 
@@ -88,7 +88,7 @@ export default function TabLayout() {
           name="students"
           options={{
             title: "Élèves",
-            tabBarIcon: ({ color }) => <User size={24} color={color} />,
+            tabBarIcon: ({ color }) => <GraduationCap size={24} color={color} />,
           }}
         />
       )}
@@ -118,7 +118,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profil",
-          tabBarIcon: ({ color }) => <User size={24} color={color} />,
+          tabBarIcon: ({ color }) => <Users size={24} color={color} />,
         }}
       />
     </Tabs>
