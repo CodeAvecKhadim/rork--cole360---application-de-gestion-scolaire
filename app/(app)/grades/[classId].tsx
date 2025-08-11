@@ -80,6 +80,8 @@ export default function GradesScreen() {
       <Stack.Screen 
         options={{ 
           title: `Notes - ${classData?.name || 'Classe'}`,
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
           headerRight: () => (
             <TouchableOpacity 
               onPress={() => setShowAddForm(!showAddForm)}

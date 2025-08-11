@@ -144,6 +144,8 @@ export default function AttendanceScreen() {
       <Stack.Screen 
         options={{ 
           title: `Présences - ${classData?.name || 'Classe'}`,
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
           headerRight: () => (
             <TouchableOpacity 
               onPress={() => setIsRecording(!isRecording)}

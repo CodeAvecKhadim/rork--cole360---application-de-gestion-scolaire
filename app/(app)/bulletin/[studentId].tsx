@@ -190,6 +190,8 @@ export default function StudentBulletinPage() {
           title: `Bulletin de ${studentInfo.name}`,
           headerStyle: { backgroundColor: COLORS.primary },
           headerTintColor: COLORS.white,
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
         }} 
       />
       

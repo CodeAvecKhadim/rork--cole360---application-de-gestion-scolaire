@@ -122,6 +122,8 @@ export default function StudentLocationScreen() {
       <Stack.Screen 
         options={{ 
           title: `Localisation - ${student.name}`,
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
           headerRight: () => (
             <TouchableOpacity 
               style={styles.headerButton}
