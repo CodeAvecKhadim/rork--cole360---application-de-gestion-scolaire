@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, FlatList, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS } from '@/constants/colors';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, GRADIENTS } from '@/constants/colors';
 import { useAuth } from '@/hooks/auth-store';
 import { useData } from '@/hooks/data-store';
 import Avatar from '@/components/Avatar';
-import EmptyState from '@/components/EmptyState';
-import { MessageSquare } from 'lucide-react-native';
+import { MessageSquare, Clock } from 'lucide-react-native';
 import { formatDistanceToNow } from '@/utils/date';
 
 export default function MessagesScreen() {
@@ -46,7 +46,7 @@ export default function MessagesScreen() {
     const conversationsArray = Array.from(conversationMap.values());
     conversationsArray.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
     setConversations(conversationsArray);
-  }, [user?.id]);
+  }, [user?.id, getMessagesByUser]);
 
   const getPartnerName = (partnerId: string) => {
     // In a real app, you would fetch the user name from a users collection
@@ -68,27 +68,44 @@ export default function MessagesScreen() {
   const renderConversationItem = ({ item }: { item: any }) => {
     const partnerName = getPartnerName(item.id);
     const { content, createdAt } = item.lastMessage;
+    const hasUnread = item.unreadCount > 0;
     
     return (
       <TouchableOpacity
-        style={styles.conversationItem}
+        style={[styles.conversationItem, hasUnread && styles.unreadConversation]}
         onPress={() => router.push(`/(app)/conversation/${item.id}` as any)}
         activeOpacity={0.7}
       >
-        <Avatar name={partnerName} size={50} />
+        <View style={styles.avatarContainer}>
+          <Avatar name={partnerName} size={56} />
+          {hasUnread && (
+            <LinearGradient
+              colors={GRADIENTS.primarySimple as any}
+              style={styles.onlineIndicator}
+            />
+          )}
+        </View>
         <View style={styles.conversationContent}>
           <View style={styles.conversationHeader}>
-            <Text style={styles.partnerName}>{partnerName}</Text>
-            <Text style={styles.timeText}>{formatDistanceToNow(createdAt)}</Text>
+            <Text style={[styles.partnerName, hasUnread && styles.unreadPartnerName]}>
+              {partnerName}
+            </Text>
+            <View style={styles.timeContainer}>
+              <Clock size={12} color={COLORS.gray} />
+              <Text style={styles.timeText}>{formatDistanceToNow(createdAt)}</Text>
+            </View>
           </View>
           <View style={styles.messagePreviewContainer}>
-            <Text style={styles.messagePreview} numberOfLines={1}>
+            <Text style={[styles.messagePreview, hasUnread && styles.unreadMessagePreview]} numberOfLines={2}>
               {content}
             </Text>
-            {item.unreadCount > 0 && (
-              <View style={styles.unreadBadge}>
+            {hasUnread && (
+              <LinearGradient
+                colors={GRADIENTS.primarySimple as any}
+                style={styles.unreadBadge}
+              >
                 <Text style={styles.unreadCount}>{item.unreadCount}</Text>
-              </View>
+              </LinearGradient>
             )}
           </View>
         </View>
@@ -98,17 +115,30 @@ export default function MessagesScreen() {
 
   return (
     <View style={styles.container}>
+      <LinearGradient colors={GRADIENTS.primary as any} style={styles.headerGradient}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Messages</Text>
+          <Text style={styles.headerSubtitle}>{conversations.length} conversation{conversations.length !== 1 ? 's' : ''}</Text>
+        </View>
+      </LinearGradient>
+      
       <FlatList
         data={conversations}
         renderItem={renderConversationItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <EmptyState
-            title="No Messages"
-            message="You don't have any messages yet."
-            icon={<MessageSquare size={50} color={COLORS.gray} />}
-          />
+          <View style={styles.emptyContainer}>
+            <LinearGradient
+              colors={GRADIENTS.info as any}
+              style={styles.emptyIconContainer}
+            >
+              <MessageSquare size={40} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.emptyTitle}>Aucun message</Text>
+            <Text style={styles.emptyMessage}>Vous n&apos;avez pas encore de messages.{"\n"}Commencez une conversation !</Text>
+          </View>
         }
       />
     </View>
@@ -120,61 +150,144 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  headerGradient: {
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  header: {
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: COLORS.white,
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontWeight: '500',
+  },
   listContent: {
     padding: 16,
+    paddingTop: 8,
   },
   conversationItem: {
     flexDirection: 'row',
-    padding: 12,
+    padding: 16,
     backgroundColor: COLORS.white,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 12,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    borderLeftWidth: 3,
+    borderLeftColor: 'transparent',
+  },
+  unreadConversation: {
+    borderLeftColor: COLORS.primary,
+    backgroundColor: 'rgba(255, 107, 53, 0.02)',
+    shadowOpacity: 0.12,
+  },
+  avatarContainer: {
+    position: 'relative',
+  },
+  onlineIndicator: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: COLORS.white,
   },
   conversationContent: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: 16,
+    justifyContent: 'center',
   },
   conversationHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   partnerName: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
     color: COLORS.text,
+    flex: 1,
+  },
+  unreadPartnerName: {
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  timeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   timeText: {
     fontSize: 12,
     color: COLORS.gray,
+    fontWeight: '500',
   },
   messagePreviewContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    gap: 8,
   },
   messagePreview: {
     flex: 1,
     fontSize: 14,
     color: COLORS.gray,
+    lineHeight: 20,
+  },
+  unreadMessagePreview: {
+    color: COLORS.text,
+    fontWeight: '500',
   },
   unreadBadge: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
+    paddingHorizontal: 8,
   },
   unreadCount: {
     color: COLORS.white,
     fontSize: 12,
+    fontWeight: '800',
+  },
+  // Styles pour l'état vide
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 40,
+  },
+  emptyIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: 20,
     fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  emptyMessage: {
+    fontSize: 16,
+    color: COLORS.gray,
+    textAlign: 'center',
+    lineHeight: 24,
   },
 });

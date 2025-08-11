@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { StyleSheet, View, Text, StyleProp, ViewStyle, TextStyle } from 'react-native';
-import { COLORS } from '@/constants/colors';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, GRADIENTS } from '@/constants/colors';
 
 interface CardProps {
   children: ReactNode;
@@ -11,6 +12,8 @@ interface CardProps {
   subtitleStyle?: StyleProp<TextStyle>;
   contentStyle?: StyleProp<ViewStyle>;
   testID?: string;
+  variant?: 'default' | 'gradient' | 'elevated';
+  headerGradient?: boolean;
 }
 
 export default function Card({
@@ -22,15 +25,48 @@ export default function Card({
   subtitleStyle,
   contentStyle,
   testID,
+  variant = 'default',
+  headerGradient = false,
 }: CardProps) {
+  const getCardStyle = () => {
+    switch (variant) {
+      case 'elevated':
+        return [styles.card, styles.elevatedCard];
+      case 'gradient':
+        return [styles.card, styles.gradientCard];
+      default:
+        return styles.card;
+    }
+  };
+
+  const renderHeader = () => {
+    if (!title && !subtitle) return null;
+
+    if (headerGradient) {
+      return (
+        <LinearGradient
+          colors={GRADIENTS.primarySimple as any}
+          style={styles.gradientHeader}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          {title && <Text style={[styles.title, styles.gradientTitle, subtitle && styles.titleWithSubtitle, titleStyle]}>{title}</Text>}
+          {subtitle && <Text style={[styles.subtitle, styles.gradientSubtitle, subtitleStyle]}>{subtitle}</Text>}
+        </LinearGradient>
+      );
+    }
+
+    return (
+      <View style={styles.header}>
+        {title && <Text style={[styles.title, subtitle && styles.titleWithSubtitle, titleStyle]}>{title}</Text>}
+        {subtitle && <Text style={[styles.subtitle, subtitleStyle]}>{subtitle}</Text>}
+      </View>
+    );
+  };
+
   return (
-    <View style={[styles.card, style]} testID={testID}>
-      {(title || subtitle) && (
-        <View style={styles.header}>
-          {title && <Text style={[styles.title, subtitle && styles.titleWithSubtitle, titleStyle]}>{title}</Text>}
-          {subtitle && <Text style={[styles.subtitle, subtitleStyle]}>{subtitle}</Text>}
-        </View>
-      )}
+    <View style={[getCardStyle(), style]} testID={testID}>
+      {renderHeader()}
       <View style={[styles.content, contentStyle]}>{children}</View>
     </View>
   );
@@ -39,33 +75,57 @@ export default function Card({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.white,
-    borderRadius: 12,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 2,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
     marginVertical: 8,
     overflow: 'hidden',
   },
+  elevatedCard: {
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+    borderRadius: 20,
+  },
+  gradientCard: {
+    borderWidth: 1,
+    borderColor: 'rgba(255, 107, 53, 0.2)',
+  },
   header: {
-    padding: 16,
+    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
+    backgroundColor: 'rgba(255, 107, 53, 0.02)',
+  },
+  gradientHeader: {
+    padding: 20,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '600' as const,
+    fontSize: 20,
+    fontWeight: '700' as const,
     color: COLORS.text,
   },
+  gradientTitle: {
+    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: '800' as const,
+  },
   titleWithSubtitle: {
-    marginBottom: 4,
+    marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
     color: COLORS.gray,
+    fontWeight: '500' as const,
+  },
+  gradientSubtitle: {
+    color: 'rgba(255, 255, 255, 0.9)',
   },
   content: {
-    padding: 16,
+    padding: 20,
   },
 });

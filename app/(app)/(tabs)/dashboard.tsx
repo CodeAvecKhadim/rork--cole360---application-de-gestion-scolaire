@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS, APP_CONFIG } from '@/constants/colors';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, GRADIENTS, APP_CONFIG } from '@/constants/colors';
 import { useAuth } from '@/hooks/auth-store';
 import { useData } from '@/hooks/data-store';
 import Card from '@/components/Card';
 import Avatar from '@/components/Avatar';
-import { Bell, MessageSquare, Users, BookOpen, School } from 'lucide-react-native';
+import { Bell, MessageSquare, Users, BookOpen, School, TrendingUp, Calendar, Award } from 'lucide-react-native';
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -25,83 +26,116 @@ export default function DashboardScreen() {
 
   const renderAdminDashboard = () => (
     <>
-      <Card title="Vue d'ensemble des écoles">
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <School size={24} color={COLORS.primary} />
-            <Text style={styles.statValue}>{getSchools().length}</Text>
-            <Text style={styles.statLabel}>Total écoles</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Users size={24} color={COLORS.secondary} />
-            <Text style={styles.statValue}>42</Text>
-            <Text style={styles.statLabel}>Total utilisateurs</Text>
-          </View>
-        </View>
+      <View style={styles.statsGrid}>
+        <LinearGradient colors={GRADIENTS.primarySimple as any} style={styles.statCard}>
+          <School size={32} color={COLORS.white} />
+          <Text style={styles.statCardValue}>{getSchools().length}</Text>
+          <Text style={styles.statCardLabel}>Écoles</Text>
+        </LinearGradient>
+        <LinearGradient colors={GRADIENTS.secondary as any} style={styles.statCard}>
+          <Users size={32} color={COLORS.white} />
+          <Text style={styles.statCardValue}>42</Text>
+          <Text style={styles.statCardLabel}>Utilisateurs</Text>
+        </LinearGradient>
+      </View>
+
+      <Card title="Gestion des écoles" style={styles.enhancedCard}>
         <TouchableOpacity 
-          style={styles.manageButton}
+          style={styles.gradientButton}
           onPress={() => router.push('/(app)/manage-schools' as any)}
         >
-          <Text style={styles.manageButtonText}>Gérer les écoles</Text>
+          <LinearGradient colors={GRADIENTS.primarySimple as any} style={styles.gradientButtonInner}>
+            <School size={20} color={COLORS.white} />
+            <Text style={styles.gradientButtonText}>Gérer les écoles</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </Card>
 
-      <Card title="Activité récente">
-        <Text style={styles.activityText}>Aucune activité récente</Text>
+      <Card title="Activité récente" style={styles.enhancedCard}>
+        <View style={styles.activityContainer}>
+          <TrendingUp size={48} color={COLORS.primary} style={styles.activityIcon} />
+          <Text style={styles.activityText}>Aucune activité récente</Text>
+          <Text style={styles.activitySubtext}>Les dernières actions apparaîtront ici</Text>
+        </View>
       </Card>
     </>
   );
 
   const renderSchoolAdminDashboard = () => (
     <>
-      <Card title="Vue d'ensemble de l'école">
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <BookOpen size={24} color={COLORS.primary} />
-            <Text style={styles.statValue}>
-              {user?.schoolId ? getClasses(user.schoolId).length : 0}
-            </Text>
-            <Text style={styles.statLabel}>Classes</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Users size={24} color={COLORS.secondary} />
-            <Text style={styles.statValue}>24</Text>
-            <Text style={styles.statLabel}>Professeurs</Text>
-          </View>
+      <View style={styles.statsGrid}>
+        <LinearGradient colors={GRADIENTS.primarySimple as any} style={styles.statCard}>
+          <BookOpen size={32} color={COLORS.white} />
+          <Text style={styles.statCardValue}>
+            {user?.schoolId ? getClasses(user.schoolId).length : 0}
+          </Text>
+          <Text style={styles.statCardLabel}>Classes</Text>
+        </LinearGradient>
+        <LinearGradient colors={GRADIENTS.secondary as any} style={styles.statCard}>
+          <Users size={32} color={COLORS.white} />
+          <Text style={styles.statCardValue}>24</Text>
+          <Text style={styles.statCardLabel}>Professeurs</Text>
+        </LinearGradient>
+      </View>
+
+      <Card title="Tableau de bord école" style={styles.enhancedCard}>
+        <View style={styles.quickActions}>
+          <TouchableOpacity style={styles.quickActionItem}>
+            <LinearGradient colors={GRADIENTS.info as any} style={styles.quickActionGradient}>
+              <Calendar size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.quickActionText}>Emploi du temps</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickActionItem}>
+            <LinearGradient colors={GRADIENTS.warm as any} style={styles.quickActionGradient}>
+              <Award size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.quickActionText}>Évaluations</Text>
+          </TouchableOpacity>
         </View>
       </Card>
 
-      <Card title="Activité récente">
-        <Text style={styles.activityText}>Aucune activité récente</Text>
+      <Card title="Activité récente" style={styles.enhancedCard}>
+        <View style={styles.activityContainer}>
+          <TrendingUp size={48} color={COLORS.primary} style={styles.activityIcon} />
+          <Text style={styles.activityText}>Aucune activité récente</Text>
+          <Text style={styles.activitySubtext}>Les dernières actions apparaîtront ici</Text>
+        </View>
       </Card>
     </>
   );
 
   const renderTeacherDashboard = () => (
     <>
-      <Card title="Vue d'ensemble des classes">
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <BookOpen size={24} color={COLORS.primary} />
-            <Text style={styles.statValue}>3</Text>
-            <Text style={styles.statLabel}>Classes</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Users size={24} color={COLORS.secondary} />
-            <Text style={styles.statValue}>68</Text>
-            <Text style={styles.statLabel}>Élèves</Text>
-          </View>
-        </View>
-      </Card>
+      <View style={styles.statsGrid}>
+        <LinearGradient colors={GRADIENTS.primarySimple as any} style={styles.statCard}>
+          <BookOpen size={32} color={COLORS.white} />
+          <Text style={styles.statCardValue}>3</Text>
+          <Text style={styles.statCardLabel}>Classes</Text>
+        </LinearGradient>
+        <LinearGradient colors={GRADIENTS.secondary as any} style={styles.statCard}>
+          <Users size={32} color={COLORS.white} />
+          <Text style={styles.statCardValue}>68</Text>
+          <Text style={styles.statCardLabel}>Élèves</Text>
+        </LinearGradient>
+      </View>
 
-      <Card title="Emploi du temps à venir">
-        <View style={styles.scheduleItem}>
-          <Text style={styles.scheduleTime}>9h00 - 10h30</Text>
-          <Text style={styles.scheduleClass}>Mathématiques - 2nde</Text>
-        </View>
-        <View style={styles.scheduleItem}>
-          <Text style={styles.scheduleTime}>11h00 - 12h30</Text>
-          <Text style={styles.scheduleClass}>Sciences - 2nde</Text>
+      <Card title="Emploi du temps à venir" style={styles.enhancedCard}>
+        <View style={styles.scheduleContainer}>
+          <LinearGradient colors={GRADIENTS.info as any} style={styles.scheduleCard}>
+            <View style={styles.scheduleHeader}>
+              <Calendar size={20} color={COLORS.white} />
+              <Text style={styles.scheduleTime}>9h00 - 10h30</Text>
+            </View>
+            <Text style={styles.scheduleClass}>Mathématiques - 2nde</Text>
+          </LinearGradient>
+          <LinearGradient colors={GRADIENTS.warm as any} style={styles.scheduleCard}>
+            <View style={styles.scheduleHeader}>
+              <Calendar size={20} color={COLORS.white} />
+              <Text style={styles.scheduleTime}>11h00 - 12h30</Text>
+            </View>
+            <Text style={styles.scheduleClass}>Sciences - 2nde</Text>
+          </LinearGradient>
         </View>
       </Card>
     </>
@@ -109,27 +143,42 @@ export default function DashboardScreen() {
 
   const renderParentDashboard = () => (
     <>
-      <Card title="Enfants">
+      <Card title="Mes enfants" style={styles.enhancedCard}>
         <View style={styles.childrenContainer}>
           {user && getStudentsByParent(user.id).map(student => (
             <TouchableOpacity 
               key={student.id}
-              style={styles.childItem}
+              style={styles.childCard}
               onPress={() => router.push(`/(app)/student/${student.id}` as any)}
             >
-              <Avatar name={student.name} size={50} />
-              <Text style={styles.childName}>{student.name}</Text>
+              <LinearGradient colors={GRADIENTS.primarySimple as any} style={styles.childGradient}>
+                <Avatar name={student.name} size={50} />
+                <Text style={styles.childName}>{student.name}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           ))}
         </View>
       </Card>
 
-      <Card title="Notes récentes">
-        <Text style={styles.activityText}>Aucune note récente</Text>
-      </Card>
+      <View style={styles.parentStatsGrid}>
+        <LinearGradient colors={GRADIENTS.success as any} style={styles.parentStatCard}>
+          <Award size={28} color={COLORS.white} />
+          <Text style={styles.parentStatValue}>A+</Text>
+          <Text style={styles.parentStatLabel}>Dernière note</Text>
+        </LinearGradient>
+        <LinearGradient colors={GRADIENTS.info as any} style={styles.parentStatCard}>
+          <Calendar size={28} color={COLORS.white} />
+          <Text style={styles.parentStatValue}>98%</Text>
+          <Text style={styles.parentStatLabel}>Présence</Text>
+        </LinearGradient>
+      </View>
 
-      <Card title="Présences">
-        <Text style={styles.activityText}>Aucun enregistrement de présence</Text>
+      <Card title="Activité récente" style={styles.enhancedCard}>
+        <View style={styles.activityContainer}>
+          <TrendingUp size={48} color={COLORS.primary} style={styles.activityIcon} />
+          <Text style={styles.activityText}>Tout va bien !</Text>
+          <Text style={styles.activitySubtext}>Aucune nouvelle notification</Text>
+        </View>
       </Card>
     </>
   );
@@ -150,41 +199,45 @@ export default function DashboardScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Bonjour,</Text>
-          <Text style={styles.name}>{user?.name}</Text>
-          <Text style={styles.slogan}>{APP_CONFIG.slogan}</Text>
+    <View style={styles.container}>
+      <LinearGradient colors={GRADIENTS.primary as any} style={styles.headerGradient}>
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
+            <Text style={styles.greeting}>Bonjour,</Text>
+            <Text style={styles.name}>{user?.name}</Text>
+            <Text style={styles.slogan}>{APP_CONFIG.slogan}</Text>
+          </View>
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity 
+              style={styles.iconButton}
+              onPress={() => router.push('/(app)/notifications' as any)}
+            >
+              <Bell size={24} color={COLORS.white} />
+              {unreadNotifications > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unreadNotifications}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.iconButton}
+              onPress={() => router.push('/(app)/(tabs)/messages' as any)}
+            >
+              <MessageSquare size={24} color={COLORS.white} />
+              {unreadMessages > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unreadMessages}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity 
-            style={styles.iconButton}
-            onPress={() => router.push('/(app)/notifications' as any)}
-          >
-            <Bell size={24} color={COLORS.text} />
-            {unreadNotifications > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{unreadNotifications}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.iconButton}
-            onPress={() => router.push('/(app)/(tabs)/messages' as any)}
-          >
-            <MessageSquare size={24} color={COLORS.text} />
-            {unreadMessages > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{unreadMessages}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {renderDashboardByRole()}
-    </ScrollView>
+      </LinearGradient>
+      
+      <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.contentContainer}>
+        {renderDashboardByRole()}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -193,6 +246,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  headerGradient: {
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 16,
+  },
+  scrollContainer: {
+    flex: 1,
+  },
   contentContainer: {
     padding: 16,
   },
@@ -200,48 +261,228 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+  },
+  headerContent: {
+    flex: 1,
   },
   greeting: {
     fontSize: 16,
-    color: COLORS.gray,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontWeight: '500',
   },
   name: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.text,
+    fontSize: 28,
+    fontWeight: '800',
+    color: COLORS.white,
+    marginVertical: 4,
   },
   slogan: {
-    fontSize: 12,
-    color: COLORS.primary,
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
     fontStyle: 'italic',
-    fontWeight: '500',
-    marginTop: 4,
+    fontWeight: '600',
   },
   actionsContainer: {
     flexDirection: 'row',
   },
   iconButton: {
-    padding: 8,
+    padding: 12,
     marginLeft: 8,
     position: 'relative',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
   },
   badge: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: COLORS.secondary,
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    top: -2,
+    right: -2,
+    backgroundColor: COLORS.accent,
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.white,
   },
   badgeText: {
     color: COLORS.white,
     fontSize: 12,
+    fontWeight: '800',
+  },
+  // Nouveaux styles pour les cartes statistiques
+  statsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    gap: 12,
+  },
+  statCard: {
+    flex: 1,
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  statCardValue: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: COLORS.white,
+    marginVertical: 8,
+  },
+  statCardLabel: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  // Styles pour les cartes améliorées
+  enhancedCard: {
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  // Styles pour les boutons avec dégradé
+  gradientButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginTop: 12,
+  },
+  gradientButtonInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    gap: 8,
+  },
+  gradientButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
     fontWeight: '700',
   },
+  // Styles pour les conteneurs d'activité
+  activityContainer: {
+    alignItems: 'center',
+    paddingVertical: 24,
+  },
+  activityIcon: {
+    marginBottom: 12,
+    opacity: 0.6,
+  },
+  activityText: {
+    fontSize: 16,
+    color: COLORS.text,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  activitySubtext: {
+    fontSize: 14,
+    color: COLORS.gray,
+    textAlign: 'center',
+  },
+  // Styles pour les actions rapides
+  quickActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 12,
+  },
+  quickActionItem: {
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 8,
+  },
+  quickActionGradient: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  quickActionText: {
+    fontSize: 12,
+    color: COLORS.text,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  // Styles pour l'emploi du temps
+  scheduleContainer: {
+    gap: 12,
+  },
+  scheduleCard: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  scheduleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  scheduleTime: {
+    fontSize: 14,
+    color: COLORS.white,
+    fontWeight: '700',
+  },
+  scheduleClass: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '600',
+  },
+  // Styles pour les enfants (parents)
+  childCard: {
+    margin: 8,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  childGradient: {
+    padding: 16,
+    alignItems: 'center',
+    minWidth: 120,
+  },
+  childName: {
+    fontSize: 14,
+    color: COLORS.white,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  // Styles pour les statistiques des parents
+  parentStatsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    gap: 12,
+  },
+  parentStatCard: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  parentStatValue: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: COLORS.white,
+    marginVertical: 6,
+  },
+  parentStatLabel: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  // Anciens styles conservés pour compatibilité
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -261,26 +502,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.gray,
   },
-  activityText: {
-    fontSize: 14,
-    color: COLORS.gray,
-    textAlign: 'center',
-    padding: 16,
-  },
   scheduleItem: {
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
-  },
-  scheduleTime: {
-    fontSize: 14,
-    color: COLORS.primary,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  scheduleClass: {
-    fontSize: 16,
-    color: COLORS.text,
   },
   childrenContainer: {
     flexDirection: 'row',
@@ -292,12 +517,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: 8,
     width: 80,
-  },
-  childName: {
-    fontSize: 14,
-    color: COLORS.text,
-    textAlign: 'center',
-    marginTop: 8,
   },
   manageButton: {
     backgroundColor: COLORS.primary,

@@ -1,10 +1,12 @@
 // Palette de couleurs principale de l'application École-360
 // Toutes les couleurs utilisées dans l'app sont centralisées ici
 export const COLORS = {
-  // Couleurs principales de la marque
-  primary: "#4A6FFF", // Bleu principal - utilisé pour les boutons et éléments importants
-  primaryDark: "#3D5CCC", // Version plus foncée du bleu principal
-  secondary: "#FF6B6B", // Rouge secondaire - utilisé pour les accents et notifications
+  // Couleurs principales de la marque - Dégradé orange vibrant
+  primary: "#FF6B35", // Orange principal - couleur de base du dégradé
+  primaryDark: "#E55A2B", // Version plus foncée de l'orange
+  primaryLight: "#FF8A5B", // Version plus claire de l'orange
+  secondary: "#F7931E", // Orange moyen - deuxième couleur du dégradé
+  accent: "#FFD23F", // Jaune doré - troisième couleur du dégradé
   
   // Couleurs d'état (feedback utilisateur)
   success: "#4CAF50", // Vert - pour les messages de succès
@@ -39,10 +41,13 @@ export const COLORS = {
 // Dégradés de couleurs pour les éléments visuels avancés
 // Utilisés avec LinearGradient pour créer des effets visuels
 export const GRADIENTS = {
-  primary: ["#4A6FFF", "#6B8DFF"], // Dégradé bleu principal
-  secondary: ["#FF6B6B", "#FF8E8E"], // Dégradé rouge secondaire
+  primary: ["#FF6B35", "#F7931E", "#FFD23F"], // Dégradé orange principal (3 couleurs)
+  primarySimple: ["#FF6B35", "#F7931E"], // Dégradé orange simple (2 couleurs)
+  secondary: ["#F7931E", "#FFD23F"], // Dégradé orange-jaune
   success: ["#4CAF50", "#66BB6A"], // Dégradé vert de succès
-  info: ["#2196F3", "#64B5F6"], // Dégradé bleu d'information
+  info: ["#FF8A5B", "#FFB347"], // Dégradé orange clair
+  warm: ["#FF6B35", "#FF8A5B", "#FFB347"], // Dégradé chaud
+  sunset: ["#FFD23F", "#F7931E", "#FF6B35"], // Dégradé coucher de soleil
 };
 
 // Configuration globale de l'application
