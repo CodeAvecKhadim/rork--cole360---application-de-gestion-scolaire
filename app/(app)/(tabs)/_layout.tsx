@@ -24,7 +24,7 @@ export default function TabLayout() {
     >
       {/* Onglet Tableau de bord - Visible pour tous les utilisateurs */}
       <Tabs.Screen
-        name="index"
+        name="dashboard"
         options={{
           title: "Tableau de bord",
           tabBarIcon: ({ color }) => <Home size={24} color={color} />,
