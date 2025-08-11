@@ -3,6 +3,9 @@ import createContextHook from '@nkzw/create-context-hook';
 import { useEffect, useState, useCallback } from 'react';
 import { User, UserRole, UserPermissions } from '@/types/auth';
 import { useSecurity } from '@/hooks/security-store';
+import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
+import { auth } from '@/libs/firebase';
+import { authService } from '@/services/auth';
 
 // Fonction pour générer les permissions par défaut selon le rôle
 const getDefaultPermissions = (role: UserRole): UserPermissions => {
@@ -183,40 +186,70 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     SecurityUtils,
   } = useSecurity();
 
+  // Écouter les changements d'état d'authentification Firebase
   useEffect(() => {
-    const loadUser = async () => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       try {
-        const storedUser = await AsyncStorage.getItem('user');
-        const storedSession = await AsyncStorage.getItem('currentSession');
-        
-        if (storedUser) {
-          const userData = JSON.parse(storedUser);
-          setUser(userData);
+        if (firebaseUser) {
+          console.log('Firebase user connecté:', firebaseUser.uid);
           
-          if (storedSession) {
-            setCurrentSession(storedSession);
-          }
+          // Récupérer le profil utilisateur depuis Firestore
+          const userProfile = await authService.getUserProfile(firebaseUser.uid);
           
-          // Enregistrer la restauration de session
-          try {
-            await logSecurityEvent('SESSION_RESTORED', 'authentication', userData.id, true, {
-              sessionId: storedSession
+          if (userProfile) {
+            // Convertir le profil Firebase vers le format local
+            const localUser: User = {
+              id: userProfile.uid,
+              email: userProfile.email,
+              name: `${userProfile.prenom} ${userProfile.nom}`,
+              role: userProfile.role === 'prof' ? 'teacher' : 
+                    userProfile.role === 'admin' ? 'admin' : 'parent',
+              avatar: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000)}?q=80&w=200&auto=format&fit=crop`,
+              country: 'Sénégal',
+              countryCode: 'SN',
+              phone: '+221771234567',
+              permissions: getDefaultPermissions(
+                userProfile.role === 'prof' ? 'teacher' : 
+                userProfile.role === 'admin' ? 'admin' : 'parent'
+              ),
+              isActive: userProfile.is_active,
+              emailVerified: firebaseUser.emailVerified,
+              phoneVerified: false,
+              twoFactorEnabled: false,
+              lastPasswordChange: Date.now(),
+              failedLoginAttempts: 0,
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            };
+            
+            setUser(localUser);
+            await AsyncStorage.setItem('user', JSON.stringify(localUser));
+            
+            // Créer une session locale
+            const session = await createSession(localUser.id);
+            setCurrentSession(session.id);
+            await AsyncStorage.setItem('currentSession', session.id);
+            
+            await logSecurityEvent('FIREBASE_SESSION_RESTORED', 'authentication', localUser.id, true, {
+              firebaseUid: firebaseUser.uid
             });
-          } catch (securityError) {
-            console.warn('Failed to log security event:', securityError);
           }
+        } else {
+          console.log('Firebase user déconnecté');
+          // Nettoyer l'état local quand Firebase se déconnecte
+          setUser(null);
+          setCurrentSession(null);
+          await AsyncStorage.multiRemove(['user', 'currentSession']);
         }
-      } catch (err) {
-        console.error('Erreur lors du chargement de l\'utilisateur:', err);
-        // En cas d'erreur, nettoyer les données corrompues
-        await AsyncStorage.multiRemove(['user', 'currentSession']);
+      } catch (error) {
+        console.error('Erreur lors de la synchronisation Firebase:', error);
       } finally {
         setLoading(false);
       }
-    };
+    });
 
-    loadUser();
-  }, []);
+    return () => unsubscribe();
+  }, [createSession, logSecurityEvent]);
 
   const login = async (email: string, password: string, rememberMe: boolean = false) => {
     try {
@@ -443,7 +476,10 @@ export const [AuthContext, useAuth] = createContextHook(() => {
         });
       }
       
-      // Supprimer les données utilisateur
+      // Déconnexion Firebase
+      await authService.signOut();
+      
+      // Supprimer les données utilisateur locales
       await AsyncStorage.removeItem('user');
       await AsyncStorage.removeItem('currentSession');
       
@@ -456,7 +492,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
       setUser(null);
       setCurrentSession(null);
       
-      console.log('Déconnexion réussie');
+      console.log('Déconnexion Firebase et locale réussie');
     } catch (err) {
       console.error('Erreur lors de la déconnexion:', err);
     } finally {
