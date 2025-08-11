@@ -34,14 +34,15 @@ export default function ManageSchoolsScreen() {
 
   const schools = getSchools();
 
-  const handleAddSchool = () => {
+  const handleAddSchool = async () => {
     if (!formData.name || !formData.address || !formData.phone || !formData.email) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs obligatoires');
       return;
     }
 
     try {
-      addSchool({
+      console.log('Ajout d\'une nouvelle école:', formData);
+      const newSchool = addSchool({
         name: formData.name,
         address: formData.address,
         phone: formData.phone,
@@ -50,6 +51,7 @@ export default function ManageSchoolsScreen() {
         adminId: formData.adminId || '2', // Default to school admin
         isActive: true,
       });
+      console.log('École ajoutée avec succès:', newSchool);
 
       setFormData({
         name: '',
@@ -61,6 +63,7 @@ export default function ManageSchoolsScreen() {
       setShowAddForm(false);
       Alert.alert('Succès', 'École ajoutée avec succès');
     } catch (error) {
+      console.error('Erreur lors de l\'ajout de l\'école:', error);
       Alert.alert('Erreur', 'Impossible d\'ajouter l\'école');
     }
   };

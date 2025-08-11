@@ -23,14 +23,20 @@ export default function StudentDetailScreen() {
   if (!student) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>Student not found</Text>
+        <Text style={styles.errorText}>Élève introuvable</Text>
       </View>
     );
   }
 
   return (
     <>
-      <Stack.Screen options={{ title: student.name }} />
+      <Stack.Screen 
+        options={{ 
+          title: student.name,
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
+        }} 
+      />
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>
           <Avatar name={student.name} size={80} />
@@ -43,11 +49,11 @@ export default function StudentDetailScreen() {
           )}
         </View>
 
-        <Card title="Schedule">
+        <Card title="Emploi du temps">
           <View style={styles.scheduleItem}>
             <Clock size={18} color={COLORS.gray} />
             <Text style={styles.scheduleText}>
-              {studentClass?.schedule || 'No schedule available'}
+              {studentClass?.schedule || 'Aucun emploi du temps disponible'}
             </Text>
           </View>
         </Card>
@@ -64,12 +70,12 @@ export default function StudentDetailScreen() {
         <View style={styles.tabContainer}>
           <View style={styles.tabs}>
             <TouchableTab
-              title="Grades"
+              title="Notes"
               isActive={activeTab === 'grades'}
               onPress={() => setActiveTab('grades')}
             />
             <TouchableTab
-              title="Attendance"
+              title="Présences"
               isActive={activeTab === 'attendance'}
               onPress={() => setActiveTab('attendance')}
             />
@@ -80,7 +86,7 @@ export default function StudentDetailScreen() {
               {grades.length > 0 ? (
                 grades.map(grade => <GradeItem key={grade.id} grade={grade} />)
               ) : (
-                <Text style={styles.emptyText}>No grades available</Text>
+                <Text style={styles.emptyText}>Aucune note disponible</Text>
               )}
             </View>
           )}
@@ -90,7 +96,7 @@ export default function StudentDetailScreen() {
               {attendance.length > 0 ? (
                 attendance.map(item => <AttendanceItem key={item.id} attendance={item} />)
               ) : (
-                <Text style={styles.emptyText}>No attendance records available</Text>
+                <Text style={styles.emptyText}>Aucun enregistrement de présence disponible</Text>
               )}
             </View>
           )}

@@ -7,7 +7,7 @@ import { useData } from '@/hooks/data-store';
 import { Student } from '@/types/auth';
 import Card from '@/components/Card';
 import StudentItem from '@/components/StudentItem';
-import Button from '@/components/Button';
+
 import { Clock, Users, BookOpen, UserCheck, BarChart3 } from 'lucide-react-native';
 
 export default function ClassDetailScreen() {
@@ -35,7 +35,13 @@ export default function ClassDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: classData.name }} />
+      <Stack.Screen 
+        options={{ 
+          title: classData.name,
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
+        }} 
+      />
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <Card title="Informations de la classe">
           <View style={styles.infoItem}>

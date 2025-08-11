@@ -46,7 +46,7 @@ export function LocationItem({ location, studentName, onPress }: LocationItemPro
         <View style={styles.schoolStatus}>
           {location.isInSchool ? (
             <View style={styles.inSchoolBadge}>
-              <Text style={styles.inSchoolText}>À l'école</Text>
+              <Text style={styles.inSchoolText}>À l&apos;école</Text>
             </View>
           ) : (
             <View style={styles.outSchoolBadge}>

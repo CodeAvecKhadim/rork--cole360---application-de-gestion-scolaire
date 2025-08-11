@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Alert, Platform } from 'react-native';
 import { Stack } from 'expo-router';
-import { MapPin, AlertTriangle, Settings, Shield, Plus } from 'lucide-react-native';
+import { MapPin, AlertTriangle, Settings, Shield } from 'lucide-react-native';
 import * as Location from 'expo-location';
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/hooks/auth-store';
@@ -51,8 +51,8 @@ export default function LocationScreen() {
   const requestLocationPermission = async () => {
     if (Platform.OS === 'web') {
       Alert.alert(
-        'Géolocalisation',
-        'La géolocalisation n\'est pas disponible sur le web dans cette démo.'
+        'Localisation',
+        'La localisation n\'est pas disponible sur le web dans cette démo.'
       );
       return;
     }
@@ -68,12 +68,12 @@ export default function LocationScreen() {
       } else {
         Alert.alert(
           'Permission refusée',
-          'La géolocalisation est nécessaire pour localiser vos enfants.'
+          'La localisation est nécessaire pour localiser vos enfants.'
         );
       }
     } catch (error) {
       console.log('Error requesting location permission:', error);
-      Alert.alert('Erreur', 'Impossible de demander la permission de géolocalisation.');
+      Alert.alert('Erreur', 'Impossible de demander la permission de localisation.');
     }
   };
 
@@ -81,7 +81,7 @@ export default function LocationScreen() {
     if (!locationPermission && enabled) {
       Alert.alert(
         'Permission requise',
-        'Vous devez d\'abord autoriser la géolocalisation.',
+        'Vous devez d\'abord autoriser la localisation.',
         [
           { text: 'Annuler', style: 'cancel' },
           { text: 'Autoriser', onPress: requestLocationPermission }
@@ -170,7 +170,7 @@ export default function LocationScreen() {
             <View style={styles.permissionContent}>
               <Text style={styles.permissionTitle}>Permission requise</Text>
               <Text style={styles.permissionText}>
-                Autorisez la géolocalisation pour localiser vos enfants
+                Autorisez la localisation pour localiser vos enfants
               </Text>
             </View>
             <Button

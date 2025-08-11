@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
+import { Stack } from 'expo-router';
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/hooks/auth-store';
 import { useData } from '@/hooks/data-store';
@@ -21,7 +22,15 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <>
+      <Stack.Screen 
+        options={{ 
+          title: 'Notifications',
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
+        }} 
+      />
+      <View style={styles.container}>
       <FlatList
         data={notifications}
         renderItem={({ item }) => (
@@ -34,13 +43,14 @@ export default function NotificationsScreen() {
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <EmptyState
-            title="No Notifications"
-            message="You don't have any notifications yet."
+            title="Aucune notification"
+            message="Vous n'avez aucune notification pour le moment."
             icon={<Bell size={50} color={COLORS.gray} />}
           />
         }
       />
-    </View>
+      </View>
+    </>
   );
 }
 

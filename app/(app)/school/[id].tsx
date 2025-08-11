@@ -19,7 +19,7 @@ export default function SchoolDetailScreen() {
   if (!school) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>School not found</Text>
+        <Text style={styles.errorText}>École introuvable</Text>
       </View>
     );
   }
@@ -30,7 +30,13 @@ export default function SchoolDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: school.name }} />
+      <Stack.Screen 
+        options={{ 
+          title: school.name,
+          headerBackVisible: true,
+          headerBackTitle: 'Retour',
+        }} 
+      />
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>
           {school.logo ? (
@@ -43,15 +49,15 @@ export default function SchoolDetailScreen() {
           <Text style={styles.name}>{school.name}</Text>
         </View>
 
-        <Card title="Contact Information">
+        <Card title="Informations de contact">
           <View style={styles.infoItem}>
             <MapPin size={20} color={COLORS.gray} />
-            <Text style={styles.infoLabel}>Address:</Text>
+            <Text style={styles.infoLabel}>Adresse:</Text>
             <Text style={styles.infoValue}>{school.address}</Text>
           </View>
           <View style={styles.infoItem}>
             <Phone size={20} color={COLORS.gray} />
-            <Text style={styles.infoLabel}>Phone:</Text>
+            <Text style={styles.infoLabel}>Téléphone:</Text>
             <Text style={styles.infoValue}>{school.phone}</Text>
           </View>
           <View style={styles.infoItem}>
@@ -74,7 +80,7 @@ export default function SchoolDetailScreen() {
             />
           ))
         ) : (
-          <Text style={styles.emptyText}>No classes available for this school</Text>
+          <Text style={styles.emptyText}>Aucune classe disponible pour cette école</Text>
         )}
       </ScrollView>
     </>
