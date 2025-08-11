@@ -8,8 +8,7 @@ import {
   doc, 
   setDoc, 
   getDoc, 
-  serverTimestamp,
-  type DocumentData 
+  serverTimestamp
 } from 'firebase/firestore';
 import { auth, db } from '@/libs/firebase';
 
@@ -24,6 +23,46 @@ export interface UserProfile {
 }
 
 export const authService = {
+  // Créer les comptes de démonstration
+  async createDemoAccounts(): Promise<void> {
+    const demoAccounts = [
+      { email: 'admin@ecole-360.com', password: 'AdminSecure123!', prenom: 'Admin', nom: 'Système', role: 'admin' as const },
+      { email: 'school@ecole-360.com', password: 'SchoolAdmin123!', prenom: 'Directeur', nom: 'École', role: 'admin' as const },
+      { email: 'teacher@ecole-360.com', password: 'Teacher123!', prenom: 'Professeur', nom: 'Enseignant', role: 'prof' as const },
+      { email: 'parent@ecole-360.com', password: 'Parent123!', prenom: 'Parent', nom: 'Famille', role: 'parent' as const }
+    ];
+
+    for (const account of demoAccounts) {
+      try {
+        console.log(`Création du compte: ${account.email}`);
+        await this.signUp(account.email, account.password, account.prenom, account.nom, account.role);
+        console.log(`✅ Compte créé: ${account.email}`);
+      } catch (error: any) {
+        if (error.code === 'auth/email-already-in-use') {
+          console.log(`ℹ️ Compte déjà existant: ${account.email}`);
+        } else {
+          console.error(`❌ Erreur création ${account.email}:`, error.message);
+        }
+      }
+    }
+  },
+
+  // Vérifier si un utilisateur existe
+  async checkUserExists(email: string): Promise<boolean> {
+    try {
+      // Tenter une connexion avec un mot de passe incorrect pour vérifier l'existence
+      await signInWithEmailAndPassword(auth, email, 'test-password-incorrect');
+      return true;
+    } catch (error: any) {
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        return true; // L'utilisateur existe mais le mot de passe est incorrect
+      }
+      if (error.code === 'auth/user-not-found') {
+        return false; // L'utilisateur n'existe pas
+      }
+      return false;
+    }
+  },
   // Inscription d'un nouvel utilisateur
   async signUp(email: string, password: string, prenom: string, nom: string, role: 'admin' | 'prof' | 'parent' = 'parent'): Promise<User> {
     try {

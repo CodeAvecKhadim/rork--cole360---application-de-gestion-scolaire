@@ -23,6 +23,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false); // Affichage/masquage du mot de passe
   const [rememberMe, setRememberMe] = useState(false); // Option "Rester connecté"
   const [isLogin, setIsLogin] = useState(true); // Basculer entre connexion et inscription
+  const [isCreatingDemoAccounts, setIsCreatingDemoAccounts] = useState(false); // État pour la création des comptes démo
 
   // Charger l'email mémorisé au démarrage de l'application
   useEffect(() => {
@@ -35,6 +36,23 @@ export default function LoginScreen() {
     };
     loadRememberedEmail();
   }, [getRememberedEmail]);
+
+  // Fonction pour créer les comptes de démonstration
+  const handleCreateDemoAccounts = async () => {
+    setIsCreatingDemoAccounts(true);
+    setError('');
+    
+    try {
+      console.log('Création des comptes de démonstration...');
+      await authService.createDemoAccounts();
+      setError('✅ Comptes de démonstration créés avec succès! Vous pouvez maintenant vous connecter.');
+    } catch (err) {
+      console.error('Erreur lors de la création des comptes démo:', err);
+      setError('❌ Erreur lors de la création des comptes de démonstration');
+    } finally {
+      setIsCreatingDemoAccounts(false);
+    }
+  };
 
   // Fonction de gestion de la connexion
   const handleLogin = async () => {
@@ -56,23 +74,36 @@ export default function LoginScreen() {
       await login(email, password, rememberMe);
       
       router.replace('/(app)/(tabs)/dashboard' as any); // Redirection vers l'app principale
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erreur de connexion:', err);
       // Affichage de l'erreur en cas d'échec
       let errorMessage = 'Échec de la connexion';
-      if (err instanceof Error) {
-        if (err.message.includes('user-not-found')) {
-          errorMessage = 'Aucun compte trouvé avec cette adresse email';
-        } else if (err.message.includes('wrong-password')) {
-          errorMessage = 'Mot de passe incorrect';
-        } else if (err.message.includes('invalid-email')) {
-          errorMessage = 'Adresse email invalide';
-        } else if (err.message.includes('too-many-requests')) {
-          errorMessage = 'Trop de tentatives. Veuillez réessayer plus tard';
-        } else {
-          errorMessage = err.message;
+      
+      if (err.code) {
+        switch (err.code) {
+          case 'auth/user-not-found':
+            errorMessage = '❌ Aucun compte trouvé avec cette adresse email. Créez d\'abord les comptes de démonstration.';
+            break;
+          case 'auth/wrong-password':
+          case 'auth/invalid-credential':
+            errorMessage = '❌ Email ou mot de passe incorrect. Vérifiez vos identifiants.';
+            break;
+          case 'auth/invalid-email':
+            errorMessage = '❌ Adresse email invalide';
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = '❌ Trop de tentatives. Veuillez réessayer plus tard';
+            break;
+          case 'auth/network-request-failed':
+            errorMessage = '❌ Erreur de connexion réseau. Vérifiez votre connexion internet.';
+            break;
+          default:
+            errorMessage = `❌ Erreur: ${err.message}`;
         }
+      } else if (err.message) {
+        errorMessage = `❌ ${err.message}`;
       }
+      
       setError(errorMessage);
     }
   };
@@ -259,14 +290,25 @@ export default function LoginScreen() {
               {isLogin && (
                 <View style={styles.demoContainer}>
                   <Text style={styles.demoTitle}>Comptes de démonstration :</Text>
-                  <Text style={styles.demoText}>• Administrateur : admin@ecole-360.com</Text>
-                  <Text style={styles.demoPassword}>Mot de passe : AdminSecure123!</Text>
-                  <Text style={styles.demoText}>• Directeur : school@ecole-360.com</Text>
-                  <Text style={styles.demoPassword}>Mot de passe : SchoolAdmin123!</Text>
-                  <Text style={styles.demoText}>• Professeur : teacher@ecole-360.com</Text>
-                  <Text style={styles.demoPassword}>Mot de passe : Teacher123!</Text>
-                  <Text style={styles.demoText}>• Parent : parent@ecole-360.com</Text>
-                  <Text style={styles.demoPassword}>Mot de passe : Parent123!</Text>
+                  
+                  <Button
+                    title="Créer les comptes de démonstration"
+                    onPress={handleCreateDemoAccounts}
+                    loading={isCreatingDemoAccounts}
+                    style={styles.demoButton}
+                    testID="create-demo-accounts-button"
+                  />
+                  
+                  <View style={styles.demoAccountsList}>
+                    <Text style={styles.demoText}>• Administrateur : admin@ecole-360.com</Text>
+                    <Text style={styles.demoPassword}>Mot de passe : AdminSecure123!</Text>
+                    <Text style={styles.demoText}>• Directeur : school@ecole-360.com</Text>
+                    <Text style={styles.demoPassword}>Mot de passe : SchoolAdmin123!</Text>
+                    <Text style={styles.demoText}>• Professeur : teacher@ecole-360.com</Text>
+                    <Text style={styles.demoPassword}>Mot de passe : Teacher123!</Text>
+                    <Text style={styles.demoText}>• Parent : parent@ecole-360.com</Text>
+                    <Text style={styles.demoPassword}>Mot de passe : Parent123!</Text>
+                  </View>
                 </View>
               )}
             </View>
@@ -449,6 +491,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
     borderRadius: 12,
     padding: 16,
+    marginTop: 8,
+  },
+  demoButton: {
+    backgroundColor: '#28A745',
+    marginBottom: 16,
+    paddingVertical: 12,
+  },
+  demoAccountsList: {
     marginTop: 8,
   },
   demoTitle: {
