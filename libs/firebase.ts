@@ -9,9 +9,7 @@ const firebaseConfig = {
   projectId: "ecole-360---rork-fix",
   storageBucket: "ecole-360---rork-fix.firebasestorage.app",
   messagingSenderId: "914223114395",
-  appId: "1:914223114395:android:94b3dbb69cb032e1513e3e",
-  // Configuration iOS
-  iosAppId: "1:914223114395:ios:3b6953077b82f6da513e3e"
+  appId: "1:914223114395:android:94b3dbb69cb032e1513e3e"
 };
 
 // Initialiser Firebase
