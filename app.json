@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.rork.ecole360-application-de-gestion-scolaire",
+      "bundleIdentifier": "com.ecole360.app",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow $(PRODUCT_NAME) to use your location.",
@@ -31,7 +31,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.ecole360-application-de-gestion-scolaire",
+      "package": "com.ecole360.app",
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
