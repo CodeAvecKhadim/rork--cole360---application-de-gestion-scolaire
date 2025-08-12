@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  TextInput
+  TextInput,
+  Dimensions,
+  Platform
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -24,8 +26,14 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
-  Phone
+  Phone,
+  Heart,
+  Shield,
+  Star,
+  Users
 } from 'lucide-react-native';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -195,10 +203,29 @@ export default function PaymentScreen() {
 
           <View style={styles.headerContainer}>
             <View style={styles.iconWrapper}>
-              {getStatusIcon()}
+              <LinearGradient
+                colors={['rgba(255, 255, 255, 0.3)', 'rgba(255, 255, 255, 0.1)']}
+                style={styles.iconGradient}
+              >
+                {getStatusIcon()}
+              </LinearGradient>
             </View>
-            <Text style={styles.title}>Paiement</Text>
-            <Text style={styles.subtitle}>{getStatusText()}</Text>
+            <Text style={styles.title}>Suivi Scolaire Premium</Text>
+            <Text style={styles.subtitle}>Accompagnez la réussite de votre enfant</Text>
+            <View style={styles.featuresContainer}>
+              <View style={styles.featureItem}>
+                <Shield size={16} color="rgba(255, 255, 255, 0.9)" />
+                <Text style={styles.featureText}>Sécurisé</Text>
+              </View>
+              <View style={styles.featureItem}>
+                <Star size={16} color="rgba(255, 255, 255, 0.9)" />
+                <Text style={styles.featureText}>Premium</Text>
+              </View>
+              <View style={styles.featureItem}>
+                <Users size={16} color="rgba(255, 255, 255, 0.9)" />
+                <Text style={styles.featureText}>Famille</Text>
+              </View>
+            </View>
           </View>
 
           {error && (
@@ -212,34 +239,67 @@ export default function PaymentScreen() {
 
           {/* Résumé de l'abonnement */}
           <Card style={styles.summaryCard}>
-            <Text style={styles.cardTitle}>Résumé de votre abonnement</Text>
-            
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Nombre d&apos;élèves :</Text>
-              <Text style={styles.summaryValue}>{subscription.studentsCount}</Text>
-            </View>
-            
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Plan :</Text>
-              <Text style={styles.summaryValue}>{subscription.plan}</Text>
-            </View>
-            
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Durée :</Text>
-              <Text style={styles.summaryValue}>12 mois</Text>
-            </View>
-            
-            <View style={[styles.summaryRow, styles.totalRow]}>
-              <Text style={styles.totalLabel}>Total à payer :</Text>
-              <Text style={styles.totalValue}>{formatAmount(subscription.totalAmount)}</Text>
-            </View>
+            <LinearGradient
+              colors={['#F8F9FF', '#FFFFFF']}
+              style={styles.summaryGradient}
+            >
+              <View style={styles.summaryHeader}>
+                <Text style={styles.cardTitle}>✨ Votre abonnement Premium</Text>
+                <Text style={styles.cardSubtitle}>Accès complet pendant une année scolaire</Text>
+              </View>
+              
+              <View style={styles.summaryContent}>
+                <View style={styles.summaryRow}>
+                  <View style={styles.summaryLabelContainer}>
+                    <Users size={16} color={COLORS.primary} />
+                    <Text style={styles.summaryLabel}>Élèves suivis</Text>
+                  </View>
+                  <View style={styles.summaryValueContainer}>
+                    <Text style={styles.summaryValue}>{subscription.studentsCount}</Text>
+                    <Text style={styles.summaryUnit}>enfant{subscription.studentsCount > 1 ? 's' : ''}</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.summaryRow}>
+                  <View style={styles.summaryLabelContainer}>
+                    <Star size={16} color={COLORS.primary} />
+                    <Text style={styles.summaryLabel}>Formule</Text>
+                  </View>
+                  <View style={styles.summaryValueContainer}>
+                    <Text style={styles.summaryValue}>{subscription.plan}</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.summaryRow}>
+                  <View style={styles.summaryLabelContainer}>
+                    <Clock size={16} color={COLORS.primary} />
+                    <Text style={styles.summaryLabel}>Durée</Text>
+                  </View>
+                  <View style={styles.summaryValueContainer}>
+                    <Text style={styles.summaryValue}>12 mois</Text>
+                    <Text style={styles.summaryUnit}>année scolaire</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.divider} />
+                
+                <View style={[styles.summaryRow, styles.totalRow]}>
+                  <Text style={styles.totalLabel}>💝 Investissement annuel</Text>
+                  <View style={styles.totalContainer}>
+                    <Text style={styles.totalValue}>{formatAmount(subscription.totalAmount)}</Text>
+                    <Text style={styles.totalNote}>pour toute l'année</Text>
+                  </View>
+                </View>
+              </View>
+            </LinearGradient>
           </Card>
 
           {paymentStatus === 'idle' && (
             <>
               {/* Sélection de la méthode de paiement */}
               <Card style={styles.methodCard}>
-                <Text style={styles.cardTitle}>Choisissez votre méthode de paiement</Text>
+                <Text style={styles.cardTitle}>💳 Méthode de paiement</Text>
+                <Text style={styles.cardSubtitle}>Choisissez votre solution mobile money préférée</Text>
                 
                 <View style={styles.methodsContainer}>
                   <TouchableOpacity
@@ -248,20 +308,33 @@ export default function PaymentScreen() {
                       selectedMethod === 'wave' && styles.selectedMethod
                     ]}
                     onPress={() => setSelectedMethod('wave')}
+                    activeOpacity={0.8}
                   >
-                    <Smartphone size={32} color={selectedMethod === 'wave' ? '#FFFFFF' : '#FF6B35'} />
-                    <Text style={[
-                      styles.methodText,
-                      selectedMethod === 'wave' && styles.selectedMethodText
-                    ]}>
-                      Wave
-                    </Text>
-                    <Text style={[
-                      styles.methodDescription,
-                      selectedMethod === 'wave' && styles.selectedMethodDescription
-                    ]}>
-                      Numéros sénégalais (+221)
-                    </Text>
+                    <LinearGradient
+                      colors={selectedMethod === 'wave' ? ['#FF6B35', '#F7931E'] : ['#FFFFFF', '#F8F9FA']}
+                      style={styles.methodGradient}
+                    >
+                      <View style={styles.methodIconContainer}>
+                        <Smartphone size={28} color={selectedMethod === 'wave' ? '#FFFFFF' : '#FF6B35'} />
+                        {selectedMethod === 'wave' && (
+                          <View style={styles.selectedBadge}>
+                            <CheckCircle size={16} color="#FFFFFF" />
+                          </View>
+                        )}
+                      </View>
+                      <Text style={[
+                        styles.methodText,
+                        selectedMethod === 'wave' && styles.selectedMethodText
+                      ]}>
+                        Wave
+                      </Text>
+                      <Text style={[
+                        styles.methodDescription,
+                        selectedMethod === 'wave' && styles.selectedMethodDescription
+                      ]}>
+                        Sénégal (+221)
+                      </Text>
+                    </LinearGradient>
                   </TouchableOpacity>
                   
                   <TouchableOpacity
@@ -270,59 +343,106 @@ export default function PaymentScreen() {
                       selectedMethod === 'orange_money' && styles.selectedMethod
                     ]}
                     onPress={() => setSelectedMethod('orange_money')}
+                    activeOpacity={0.8}
                   >
-                    <Wallet size={32} color={selectedMethod === 'orange_money' ? '#FFFFFF' : '#FF8C00'} />
-                    <Text style={[
-                      styles.methodText,
-                      selectedMethod === 'orange_money' && styles.selectedMethodText
-                    ]}>
-                      Orange Money
-                    </Text>
-                    <Text style={[
-                      styles.methodDescription,
-                      selectedMethod === 'orange_money' && styles.selectedMethodDescription
-                    ]}>
-                      Afrique de l&apos;Ouest
-                    </Text>
+                    <LinearGradient
+                      colors={selectedMethod === 'orange_money' ? ['#FF8C00', '#FFA500'] : ['#FFFFFF', '#F8F9FA']}
+                      style={styles.methodGradient}
+                    >
+                      <View style={styles.methodIconContainer}>
+                        <Wallet size={28} color={selectedMethod === 'orange_money' ? '#FFFFFF' : '#FF8C00'} />
+                        {selectedMethod === 'orange_money' && (
+                          <View style={styles.selectedBadge}>
+                            <CheckCircle size={16} color="#FFFFFF" />
+                          </View>
+                        )}
+                      </View>
+                      <Text style={[
+                        styles.methodText,
+                        selectedMethod === 'orange_money' && styles.selectedMethodText
+                      ]}>
+                        Orange Money
+                      </Text>
+                      <Text style={[
+                        styles.methodDescription,
+                        selectedMethod === 'orange_money' && styles.selectedMethodDescription
+                      ]}>
+                        Afrique de l'Ouest
+                      </Text>
+                    </LinearGradient>
                   </TouchableOpacity>
                 </View>
               </Card>
 
               {/* Saisie du numéro de téléphone */}
               <Card style={styles.phoneCard}>
-                <Text style={styles.cardTitle}>Numéro de téléphone</Text>
+                <Text style={styles.cardTitle}>📱 Votre numéro {selectedMethod === 'wave' ? 'Wave' : 'Orange Money'}</Text>
                 <Text style={styles.phoneDescription}>
-                  Saisissez le numéro de téléphone associé à votre compte {selectedMethod === 'wave' ? 'Wave' : 'Orange Money'}
+                  Saisissez le numéro associé à votre compte {selectedMethod === 'wave' ? 'Wave' : 'Orange Money'} pour finaliser le paiement
                 </Text>
                 
-                <View style={styles.phoneInputContainer}>
-                  <Phone size={20} color={COLORS.gray} style={styles.phoneIcon} />
-                  <TextInput
-                    style={styles.phoneInput}
-                    value={phoneNumber}
-                    onChangeText={setPhoneNumber}
-                    placeholder={selectedMethod === 'wave' ? '+221 XX XXX XX XX' : '+22X XX XXX XX XX'}
-                    keyboardType="phone-pad"
-                    autoCapitalize="none"
-                    testID="phone-input"
-                  />
+                <View style={styles.phoneInputWrapper}>
+                  <View style={[
+                    styles.phoneInputContainer,
+                    phoneNumber.length > 0 && styles.phoneInputFocused
+                  ]}>
+                    <View style={styles.phoneIconWrapper}>
+                      <Phone size={20} color={phoneNumber.length > 0 ? COLORS.primary : COLORS.gray} />
+                    </View>
+                    <TextInput
+                      style={styles.phoneInput}
+                      value={phoneNumber}
+                      onChangeText={setPhoneNumber}
+                      placeholder={selectedMethod === 'wave' ? '+221 XX XXX XX XX' : '+22X XX XXX XX XX'}
+                      placeholderTextColor={COLORS.lightGray}
+                      keyboardType="phone-pad"
+                      autoCapitalize="none"
+                      testID="phone-input"
+                    />
+                  </View>
+                  
+                  <View style={styles.phoneHint}>
+                    <Text style={styles.phoneNote}>
+                      {selectedMethod === 'wave' 
+                        ? '🇸🇳 Format sénégalais : +221XXXXXXXXX'
+                        : '🌍 Format international : +22XXXXXXXXXX'
+                      }
+                    </Text>
+                  </View>
                 </View>
-                
-                <Text style={styles.phoneNote}>
-                  {selectedMethod === 'wave' 
-                    ? 'Format : +221XXXXXXXXX (numéros sénégalais uniquement)'
-                    : 'Format : +22XXXXXXXXXX (Sénégal, Mali, Burkina Faso, etc.)'
-                  }
-                </Text>
               </Card>
 
-              <Button
-                title={isProcessing ? 'Traitement...' : `Payer ${formatAmount(subscription.totalAmount)}`}
+              <TouchableOpacity
+                style={[
+                  styles.payButton,
+                  isProcessing && styles.payButtonDisabled
+                ]}
                 onPress={handlePayment}
-                loading={isProcessing}
-                style={styles.payButton}
+                disabled={isProcessing}
                 testID="pay-button"
-              />
+              >
+                <LinearGradient
+                  colors={isProcessing ? ['#CCCCCC', '#999999'] : ['#FF6B35', '#F7931E']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.payButtonGradient}
+                >
+                  <View style={styles.payButtonContent}>
+                    <Heart size={20} color="#FFFFFF" style={styles.payButtonIcon} />
+                    <View style={styles.payButtonTextContainer}>
+                      <Text style={styles.payButtonTitle}>
+                        {isProcessing ? 'Traitement en cours...' : 'Oui, je veux suivre les études'}
+                      </Text>
+                      <Text style={styles.payButtonSubtitle}>
+                        {isProcessing ? 'Veuillez patienter' : `de mon enfant(s) • ${formatAmount(subscription.totalAmount)}`}
+                      </Text>
+                    </View>
+                    {isProcessing && (
+                      <ActivityIndicator size="small" color="#FFFFFF" style={styles.payButtonLoader} />
+                    )}
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
             </>
           )}
 
@@ -416,23 +536,50 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    marginBottom: 24,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  iconGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+  },
+  featuresContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
+    marginTop: 16,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  featureText: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '500' as const,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '800' as const,
     color: '#FFFFFF',
     marginBottom: 8,
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
     fontWeight: '500' as const,
+    lineHeight: 22,
   },
   errorCard: {
     marginBottom: 20,
@@ -453,12 +600,61 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     marginBottom: 20,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  summaryGradient: {
+    padding: 24,
+  },
+  summaryHeader: {
+    marginBottom: 20,
+  },
+  summaryContent: {
+    gap: 16,
+  },
+  summaryLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  summaryValueContainer: {
+    alignItems: 'flex-end',
+  },
+  summaryUnit: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: 2,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.lightGray,
+    marginVertical: 8,
+  },
+  totalContainer: {
+    alignItems: 'flex-end',
+  },
+  totalNote: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: 2,
+    fontStyle: 'italic',
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     color: COLORS.text,
-    marginBottom: 16,
+    marginBottom: 8,
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: COLORS.gray,
+    marginBottom: 20,
+    lineHeight: 20,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -500,16 +696,31 @@ const styles = StyleSheet.create({
   },
   methodOption: {
     flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  methodGradient: {
     alignItems: 'center',
     padding: 20,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: COLORS.lightGray,
-    backgroundColor: '#FFFFFF',
+    minHeight: 120,
+    justifyContent: 'center',
   },
-  selectedMethod: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary,
+  methodIconContainer: {
+    position: 'relative',
+    marginBottom: 12,
+  },
+  selectedBadge: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 12,
+    padding: 2,
   },
   methodText: {
     fontSize: 16,
@@ -538,35 +749,95 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     lineHeight: 20,
   },
+  phoneInputWrapper: {
+    gap: 12,
+  },
   phoneInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
+    borderRadius: 16,
+    borderWidth: 2,
     borderColor: '#E9ECEF',
-    marginBottom: 8,
+    overflow: 'hidden',
+    transition: 'all 0.2s ease',
   },
-  phoneIcon: {
-    marginRight: 12,
+  phoneInputFocused: {
+    borderColor: COLORS.primary,
+    backgroundColor: '#FFFFFF',
+    elevation: 2,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  phoneIconWrapper: {
+    paddingHorizontal: 16,
+    paddingVertical: 18,
+    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+  },
+  phoneHint: {
+    paddingHorizontal: 4,
   },
   phoneInput: {
     flex: 1,
-    paddingVertical: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
     fontSize: 16,
     color: COLORS.text,
+    fontWeight: '500' as const,
   },
   phoneNote: {
     fontSize: 12,
     color: COLORS.gray,
-    fontStyle: 'italic',
+    fontWeight: '500' as const,
+    textAlign: 'center',
   },
   payButton: {
     marginBottom: 20,
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  payButtonDisabled: {
+    elevation: 2,
+    shadowOpacity: 0.1,
+  },
+  payButtonGradient: {
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+  },
+  payButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  payButtonIcon: {
+    marginRight: 12,
+  },
+  payButtonTextContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  payButtonTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  payButtonSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
+    fontWeight: '500' as const,
+  },
+  payButtonLoader: {
+    marginLeft: 12,
   },
   statusCard: {
     marginBottom: 20,
