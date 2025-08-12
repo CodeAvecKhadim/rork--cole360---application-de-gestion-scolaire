@@ -6,8 +6,9 @@ import { COLORS, GRADIENTS, APP_CONFIG } from '@/constants/colors';
 import { useAuth } from '@/hooks/auth-store';
 import { useData } from '@/hooks/data-store';
 import Card from '@/components/Card';
+import StatsCard from '@/components/StatsCard';
 import Avatar from '@/components/Avatar';
-import { Bell, MessageSquare, Users, BookOpen, School, TrendingUp, Calendar, Award } from 'lucide-react-native';
+import { Bell, MessageSquare, Users, BookOpen, School, TrendingUp, Calendar, Award, Target, Clock, CheckCircle, AlertTriangle, BarChart3, PieChart, Activity } from 'lucide-react-native';
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -530,5 +531,215 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
+  },
+  // Nouveaux styles pour les améliorations
+  analyticsContainer: {
+    gap: 16,
+  },
+  analyticsItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: `${COLORS.primary}05`,
+    borderRadius: 12,
+    gap: 16,
+  },
+  analyticsIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  analyticsContent: {
+    flex: 1,
+  },
+  analyticsTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  analyticsSubtitle: {
+    fontSize: 14,
+    color: COLORS.gray,
+    fontWeight: '500',
+  },
+  recommendationsContainer: {
+    gap: 16,
+  },
+  recommendationItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  recommendationIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recommendationContent: {
+    flex: 1,
+  },
+  recommendationTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  recommendationText: {
+    fontSize: 14,
+    color: COLORS.gray,
+    lineHeight: 20,
+  },
+  strengthsContainer: {
+    gap: 20,
+  },
+  strengthItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  strengthIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  strengthContent: {
+    flex: 1,
+  },
+  strengthTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 6,
+  },
+  strengthText: {
+    fontSize: 14,
+    color: COLORS.gray,
+    lineHeight: 20,
+  },
+  communicationContainer: {
+    gap: 12,
+  },
+  communicationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: `${COLORS.primary}05`,
+    borderRadius: 12,
+    gap: 16,
+  },
+  communicationIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  communicationContent: {
+    flex: 1,
+  },
+  communicationTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  communicationSubtitle: {
+    fontSize: 14,
+    color: COLORS.gray,
+    fontWeight: '500',
+  },
+  quickStatsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  quickStatItem: {
+    alignItems: 'center',
+  },
+  quickStatValue: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: COLORS.primary,
+    marginBottom: 4,
+  },
+  quickStatLabel: {
+    fontSize: 12,
+    color: COLORS.gray,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  systemAnalyticsContainer: {
+    gap: 16,
+  },
+  systemAnalyticsItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: `${COLORS.primary}05`,
+    borderRadius: 12,
+    gap: 16,
+  },
+  systemAnalyticsIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  systemAnalyticsContent: {
+    flex: 1,
+  },
+  systemAnalyticsTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  systemAnalyticsSubtitle: {
+    fontSize: 14,
+    color: COLORS.gray,
+    fontWeight: '500',
+  },
+  priorityActionsContainer: {
+    gap: 16,
+  },
+  priorityActionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: `${COLORS.primary}05`,
+    borderRadius: 12,
+    gap: 16,
+  },
+  priorityActionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  priorityActionContent: {
+    flex: 1,
+  },
+  priorityActionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  priorityActionSubtitle: {
+    fontSize: 14,
+    color: COLORS.gray,
+    fontWeight: '500',
   },
 });

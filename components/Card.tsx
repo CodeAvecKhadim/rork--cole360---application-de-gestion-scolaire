@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { StyleSheet, View, Text, StyleProp, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, View, Text, StyleProp, ViewStyle, TextStyle, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 
@@ -12,8 +12,9 @@ interface CardProps {
   subtitleStyle?: StyleProp<TextStyle>;
   contentStyle?: StyleProp<ViewStyle>;
   testID?: string;
-  variant?: 'default' | 'gradient' | 'elevated';
+  variant?: 'default' | 'gradient' | 'elevated' | 'outlined' | 'modern';
   headerGradient?: boolean;
+  interactive?: boolean;
 }
 
 export default function Card({
@@ -27,15 +28,20 @@ export default function Card({
   testID,
   variant = 'default',
   headerGradient = false,
+  interactive = false,
 }: CardProps) {
   const getCardStyle = () => {
     switch (variant) {
       case 'elevated':
-        return [styles.card, styles.elevatedCard];
+        return [styles.card, styles.elevatedCard, interactive && styles.interactiveCard, style];
       case 'gradient':
-        return [styles.card, styles.gradientCard];
+        return [styles.card, styles.gradientCard, interactive && styles.interactiveCard, style];
+      case 'outlined':
+        return [styles.card, styles.outlinedCard, interactive && styles.interactiveCard, style];
+      case 'modern':
+        return [styles.card, styles.modernCard, interactive && styles.interactiveCard, style];
       default:
-        return styles.card;
+        return [styles.card, interactive && styles.interactiveCard, style];
     }
   };
 
@@ -65,7 +71,7 @@ export default function Card({
   };
 
   return (
-    <View style={[getCardStyle(), style]} testID={testID}>
+    <View style={getCardStyle()} testID={testID}>
       {renderHeader()}
       <View style={[styles.content, contentStyle]}>{children}</View>
     </View>
@@ -83,6 +89,12 @@ const styles = StyleSheet.create({
     elevation: 4,
     marginVertical: 8,
     overflow: 'hidden',
+    ...Platform.select({
+      web: {
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        cursor: 'default',
+      },
+    }),
   },
   elevatedCard: {
     shadowOffset: { width: 0, height: 8 },
@@ -100,6 +112,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
     backgroundColor: 'rgba(255, 107, 53, 0.02)',
+    ...Platform.select({
+      web: {
+        backdropFilter: 'blur(10px)',
+      },
+    }),
   },
   gradientHeader: {
     padding: 20,
@@ -127,5 +144,26 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+  },
+  outlinedCard: {
+    borderWidth: 2,
+    borderColor: `${COLORS.primary}20`,
+    shadowOpacity: 0.04,
+    elevation: 2,
+  },
+  modernCard: {
+    borderRadius: 24,
+    backgroundColor: `${COLORS.primary}02`,
+    borderWidth: 1,
+    borderColor: `${COLORS.primary}08`,
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.1,
+  },
+  interactiveCard: {
+    ...Platform.select({
+      web: {
+        cursor: 'pointer',
+      },
+    }),
   },
 });

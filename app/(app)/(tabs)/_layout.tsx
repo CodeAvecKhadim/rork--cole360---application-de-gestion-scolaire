@@ -66,7 +66,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: "Tableau de bord",
+          title: "Accueil",
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               alignItems: 'center',
@@ -87,7 +87,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="schools"
           options={{
-            title: "Écoles",
+            title: "Établissements",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -109,7 +109,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="classes"
           options={{
-            title: "Classes",
+            title: "Mes Classes",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -131,7 +131,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="students"
           options={{
-            title: "Mes Enfants",
+            title: "Enfants",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -153,7 +153,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="location"
           options={{
-            title: "Localisation",
+            title: "Géolocalisation",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -174,7 +174,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="messages"
         options={{
-          title: "Messages",
+          title: "Messagerie",
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               alignItems: 'center',
@@ -194,7 +194,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profil",
+          title: "Mon Profil",
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               alignItems: 'center',
