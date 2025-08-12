@@ -2,8 +2,8 @@
 // Ce fichier définit la navigation par onglets avec des permissions basées sur les rôles
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform } from "react-native";
-import { Home, BookOpen, School, MessageSquare, MapPin, User, GraduationCap } from "lucide-react-native";
+import { Platform, View } from "react-native";
+import { BookOpen, School, MessageSquare, MapPin, User, GraduationCap, BarChart3 } from "lucide-react-native";
 import { COLORS } from "@/constants/colors";
 import { useAuth } from "@/hooks/auth-store";
 import SubscriptionGuard from "@/components/SubscriptionGuard";
@@ -17,29 +17,37 @@ export default function TabLayout() {
     <SubscriptionGuard>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: COLORS.primary, // Couleur de l'onglet actif
-          tabBarInactiveTintColor: COLORS.gray, // Couleur de l'onglet inactif
-          headerShown: true, // Afficher l'en-tête
+          tabBarActiveTintColor: COLORS.primary,
+          tabBarInactiveTintColor: '#8B8B8B',
+          headerShown: true,
           tabBarStyle: {
-            backgroundColor: Platform.OS === 'ios' ? 'rgba(255, 255, 255, 0.9)' : COLORS.white,
-            borderTopWidth: 0, // Supprimer la bordure supérieure
-            elevation: 20, // Ombre sur Android
-            shadowColor: '#000', // Ombre sur iOS
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 12,
-            height: Platform.OS === 'ios' ? 90 : 70,
-            paddingBottom: Platform.OS === 'ios' ? 25 : 10,
-            paddingTop: 10,
+            backgroundColor: Platform.OS === 'ios' ? 'rgba(255, 255, 255, 0.95)' : COLORS.white,
+            borderTopWidth: 0,
+            elevation: 25,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 16,
+            height: Platform.OS === 'ios' ? 95 : 75,
+            paddingBottom: Platform.OS === 'ios' ? 30 : 15,
+            paddingTop: 12,
+            paddingHorizontal: 8,
           },
           tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '600',
-            marginTop: 4,
+            fontSize: 11,
+            fontWeight: '700',
+            marginTop: 6,
+            letterSpacing: 0.3,
           },
           tabBarIconStyle: {
-            marginTop: 4,
+            marginTop: 2,
           },
+          tabBarItemStyle: {
+            paddingVertical: 4,
+            borderRadius: 12,
+            marginHorizontal: 2,
+          },
+          tabBarActiveBackgroundColor: `${COLORS.primary}08`,
           headerStyle: {
             backgroundColor: COLORS.primary,
             elevation: 0,
@@ -48,8 +56,9 @@ export default function TabLayout() {
           },
           headerTintColor: COLORS.white,
           headerTitleStyle: {
-            fontWeight: '700',
-            fontSize: 18,
+            fontWeight: '800',
+            fontSize: 19,
+            letterSpacing: 0.5,
           },
         }}
       >
@@ -57,8 +66,19 @@ export default function TabLayout() {
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: "Tableau de bord",
-          tabBarIcon: ({ color }) => <Home size={24} color={color} />,
+          title: "Accueil",
+          tabBarIcon: ({ color, focused }) => (
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
+            }}>
+              <BarChart3 size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+            </View>
+          ),
         }}
       />
 
@@ -68,7 +88,18 @@ export default function TabLayout() {
           name="schools"
           options={{
             title: "Écoles",
-            tabBarIcon: ({ color }) => <School size={24} color={color} />,
+            tabBarIcon: ({ color, focused }) => (
+              <View style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
+              }}>
+                <School size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+              </View>
+            ),
           }}
         />
       )}
@@ -79,7 +110,18 @@ export default function TabLayout() {
           name="classes"
           options={{
             title: "Classes",
-            tabBarIcon: ({ color }) => <BookOpen size={24} color={color} />,
+            tabBarIcon: ({ color, focused }) => (
+              <View style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
+              }}>
+                <BookOpen size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+              </View>
+            ),
           }}
         />
       )}
@@ -90,7 +132,18 @@ export default function TabLayout() {
           name="students"
           options={{
             title: "Élèves",
-            tabBarIcon: ({ color }) => <GraduationCap size={24} color={color} />,
+            tabBarIcon: ({ color, focused }) => (
+              <View style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
+              }}>
+                <GraduationCap size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+              </View>
+            ),
           }}
         />
       )}
@@ -101,7 +154,18 @@ export default function TabLayout() {
           name="location"
           options={{
             title: "Localisation",
-            tabBarIcon: ({ color }) => <MapPin size={24} color={color} />,
+            tabBarIcon: ({ color, focused }) => (
+              <View style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
+              }}>
+                <MapPin size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+              </View>
+            ),
           }}
         />
       )}
@@ -111,7 +175,18 @@ export default function TabLayout() {
         name="messages"
         options={{
           title: "Messages",
-          tabBarIcon: ({ color }) => <MessageSquare size={24} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
+            }}>
+              <MessageSquare size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+            </View>
+          ),
         }}
       />
 
@@ -120,7 +195,18 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profil",
-          tabBarIcon: ({ color }) => <User size={24} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
+            }}>
+              <User size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+            </View>
+          ),
         }}
       />
       </Tabs>
