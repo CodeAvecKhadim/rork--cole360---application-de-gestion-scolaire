@@ -7,15 +7,13 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  TextInput,
-  Dimensions,
-  Platform
+  TextInput
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '@/constants/colors';
 import { useSubscription } from '@/hooks/subscription-store';
-import { useAuth } from '@/hooks/auth-store';
+
 import Button from '@/components/Button';
 import Card from '@/components/Card';
 import {
@@ -33,11 +31,11 @@ import {
   Users
 } from 'lucide-react-native';
 
-const { width: screenWidth } = Dimensions.get('window');
+
 
 export default function PaymentScreen() {
   const router = useRouter();
-  const { user } = useAuth();
+
   const {
     subscription,
     loading,
@@ -163,18 +161,7 @@ export default function PaymentScreen() {
     }
   };
 
-  const getStatusText = () => {
-    switch (paymentStatus) {
-      case 'pending':
-        return 'Paiement en cours...';
-      case 'success':
-        return 'Paiement réussi !';
-      case 'failed':
-        return 'Paiement échoué';
-      default:
-        return 'Prêt pour le paiement';
-    }
-  };
+
 
   if (loading || !subscription) {
     return (
@@ -287,7 +274,7 @@ export default function PaymentScreen() {
                   <Text style={styles.totalLabel}>💝 Investissement annuel</Text>
                   <View style={styles.totalContainer}>
                     <Text style={styles.totalValue}>{formatAmount(subscription.totalAmount)}</Text>
-                    <Text style={styles.totalNote}>pour toute l'année</Text>
+                    <Text style={styles.totalNote}>pour toute l&apos;année</Text>
                   </View>
                 </View>
               </View>
@@ -361,7 +348,7 @@ export default function PaymentScreen() {
                         styles.methodDescription,
                         selectedMethod === 'orange_money' && styles.selectedMethodDescription
                       ]}>
-                        Afrique de l'Ouest
+                        Afrique de l&apos;Ouest
                       </Text>
                     </LinearGradient>
                   </TouchableOpacity>
