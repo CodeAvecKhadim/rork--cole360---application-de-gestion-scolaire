@@ -1,5 +1,12 @@
 // Règles Firestore pour École 360 - Version sécurisée
-// Copiez ces règles dans votre console Firebase
+// IMPORTANT: Copiez ces règles dans votre console Firebase pour corriger les erreurs de permissions
+// 
+// ÉTAPES POUR METTRE À JOUR LES RÈGLES:
+// 1. Allez sur https://console.firebase.google.com
+// 2. Sélectionnez votre projet
+// 3. Allez dans "Firestore Database" > "Règles"
+// 4. Remplacez tout le contenu par les règles ci-dessous
+// 5. Cliquez sur "Publier"
 
 rules_version = '2';
 service cloud.firestore {
@@ -121,13 +128,9 @@ service cloud.firestore {
     
     // Collection subscriptions - Gestion des abonnements
     match /subscriptions/{subscriptionId} {
-      // Les admins ont accès complet
-      allow read, write: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-      // Les utilisateurs peuvent lire et modifier leur propre abonnement
+      // Les utilisateurs authentifiés peuvent lire et modifier leurs propres abonnements
       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      // Permettre la création d'abonnement par l'utilisateur
+      // Permettre la création d'abonnement par l'utilisateur authentifié
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
     }
     
@@ -143,6 +146,14 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
       // Permettre la mise à jour du statut de paiement
       allow update: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Collection payment_transactions - Gestion des transactions de paiement
+    match /payment_transactions/{transactionId} {
+      // Les utilisateurs authentifiés peuvent lire et modifier leurs propres transactions
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Permettre la création de transaction par l'utilisateur authentifié
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
     }
     
     // Règle par défaut - Refuser tout accès non spécifié
