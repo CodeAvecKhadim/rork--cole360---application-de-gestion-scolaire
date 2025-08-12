@@ -66,7 +66,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: "Accueil",
+          title: "Tableau de bord",
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               alignItems: 'center',
@@ -87,7 +87,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="schools"
           options={{
-            title: "Établissements",
+            title: "Écoles",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -109,7 +109,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="classes"
           options={{
-            title: "Mes Classes",
+            title: "Classes",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -153,7 +153,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="location"
           options={{
-            title: "Géolocalisation",
+            title: "Localisation",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -174,7 +174,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="messages"
         options={{
-          title: "Messagerie",
+          title: "Messages",
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               alignItems: 'center',
@@ -194,7 +194,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Mon Profil",
+          title: "Profil",
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               alignItems: 'center',

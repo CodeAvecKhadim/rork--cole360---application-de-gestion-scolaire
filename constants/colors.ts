@@ -43,6 +43,7 @@ export const COLORS = {
 export const GRADIENTS = {
   primary: ["#FF6B35", "#F7931E", "#FFD23F"], // Dégradé orange principal (3 couleurs)
   primarySimple: ["#FF6B35", "#F7931E"], // Dégradé orange simple (2 couleurs)
+  primaryLight: ["#FFE5DC", "#FFF3E0"], // Dégradé orange très clair
   secondary: ["#F7931E", "#FFD23F"], // Dégradé orange-jaune
   success: ["#4CAF50", "#66BB6A"], // Dégradé vert de succès
   info: ["#FF8A5B", "#FFB347"], // Dégradé orange clair
