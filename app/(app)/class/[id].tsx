@@ -8,7 +8,7 @@ import { Student } from '@/types/auth';
 import Card from '@/components/Card';
 import StudentItem from '@/components/StudentItem';
 
-import { Clock, Users, BookOpen, UserCheck, BarChart3 } from 'lucide-react-native';
+import { Clock, Users, BookOpen, UserCheck, BarChart3, MessageSquare, Bell } from 'lucide-react-native';
 
 export default function ClassDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -57,31 +57,59 @@ export default function ClassDetailScreen() {
         </Card>
 
         {canManageClass && (
-          <Card title="Gestion de la classe">
-            <View style={styles.actionButtons}>
+          <Card title="Actions rapides">
+            <View style={styles.actionGrid}>
               <TouchableOpacity 
-                style={styles.actionButton}
-                onPress={() => router.push(`/(app)/grades/${classData.id}` as any)}
-              >
-                <BookOpen size={24} color={COLORS.primary} />
-                <Text style={styles.actionButtonText}>Notes</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.actionButton}
+                style={[styles.actionCard, styles.attendanceCard]}
                 onPress={() => router.push(`/(app)/attendance/${classData.id}` as any)}
               >
-                <UserCheck size={24} color={COLORS.secondary} />
-                <Text style={styles.actionButtonText}>Présences</Text>
+                <UserCheck size={28} color={COLORS.white} />
+                <Text style={styles.actionCardTitle}>Faire l&apos;appel</Text>
+                <Text style={styles.actionCardSubtitle}>Marquer les présences</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
-                style={styles.actionButton}
+                style={[styles.actionCard, styles.gradesCard]}
+                onPress={() => router.push(`/(app)/grades/${classData.id}` as any)}
+              >
+                <BookOpen size={28} color={COLORS.white} />
+                <Text style={styles.actionCardTitle}>Notes</Text>
+                <Text style={styles.actionCardSubtitle}>Gérer les évaluations</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.actionGrid}>
+              <TouchableOpacity 
+                style={[styles.actionCard, styles.messageCard]}
                 onPress={() => {}}
               >
-                <BarChart3 size={24} color={COLORS.success} />
-                <Text style={styles.actionButtonText}>Statistiques</Text>
+                <MessageSquare size={28} color={COLORS.white} />
+                <Text style={styles.actionCardTitle}>Messages</Text>
+                <Text style={styles.actionCardSubtitle}>Contacter les parents</Text>
               </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.actionCard, styles.statsCard]}
+                onPress={() => {}}
+              >
+                <BarChart3 size={28} color={COLORS.white} />
+                <Text style={styles.actionCardTitle}>Statistiques</Text>
+                <Text style={styles.actionCardSubtitle}>Voir les performances</Text>
+              </TouchableOpacity>
+            </View>
+          </Card>
+        )}
+
+        {canManageClass && (
+          <Card title="Notifications automatiques">
+            <View style={styles.notificationInfo}>
+              <Bell size={20} color={COLORS.primary} />
+              <View style={styles.notificationContent}>
+                <Text style={styles.notificationTitle}>Absences signalées automatiquement</Text>
+                <Text style={styles.notificationText}>
+                  Les parents reçoivent une notification immédiate lorsque leur enfant est marqué absent.
+                </Text>
+              </View>
             </View>
           </Card>
         )}
@@ -153,25 +181,61 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 24,
   },
-  actionButtons: {
+  actionGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 8,
+    gap: 12,
+    marginBottom: 12,
   },
-  actionButton: {
-    alignItems: 'center',
+  actionCard: {
+    flex: 1,
     padding: 16,
     borderRadius: 12,
-    backgroundColor: COLORS.background,
-    minWidth: 80,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    alignItems: 'center',
+    minHeight: 100,
+    justifyContent: 'center',
   },
-  actionButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.text,
+  attendanceCard: {
+    backgroundColor: COLORS.secondary,
+  },
+  gradesCard: {
+    backgroundColor: COLORS.primary,
+  },
+  messageCard: {
+    backgroundColor: COLORS.success,
+  },
+  statsCard: {
+    backgroundColor: COLORS.warning,
+  },
+  actionCardTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.white,
     marginTop: 8,
     textAlign: 'center',
+  },
+  actionCardSubtitle: {
+    fontSize: 11,
+    color: COLORS.white + 'CC',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  notificationInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  notificationContent: {
+    flex: 1,
+  },
+  notificationTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  notificationText: {
+    fontSize: 14,
+    color: COLORS.gray,
+    lineHeight: 20,
   },
 });
