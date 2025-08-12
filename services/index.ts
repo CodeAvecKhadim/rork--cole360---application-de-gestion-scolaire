@@ -8,6 +8,7 @@ export { messageService } from './messages';
 // Export des services existants
 export { authService } from './auth';
 export { locationService } from './location';
+export { storageService } from './storage';
 
 // Export des nouveaux services
 export { subscriptionService } from './subscription';

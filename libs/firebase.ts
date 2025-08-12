@@ -1,6 +1,7 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
 // Configuration Firebase basée sur votre google-services.json et GoogleService-Info.plist
 const firebaseConfig = {
@@ -21,12 +22,16 @@ const auth: Auth = getAuth(app);
 // Initialiser Firestore
 const db: Firestore = getFirestore(app);
 
+// Initialiser Storage
+const storage: FirebaseStorage = getStorage(app);
+
 // Vérifier la connexion Firebase
 console.log('🔥 Firebase initialisé avec succès');
 console.log('📋 Project ID:', firebaseConfig.projectId);
 console.log('🌐 Auth Domain:', firebaseConfig.authDomain);
 console.log('🔑 API Key:', firebaseConfig.apiKey.substring(0, 10) + '...');
 console.log('📱 App ID:', firebaseConfig.appId);
+console.log('💾 Storage Bucket:', firebaseConfig.storageBucket);
 
 // Test de connexion Firebase
 export const testFirebaseConnection = async () => {
@@ -43,10 +48,12 @@ export const testFirebaseConnection = async () => {
     return {
       auth: !!auth,
       firestore: !!db,
+      storage: !!storage,
       currentUser: currentUser?.uid || null,
       config: {
         projectId: firebaseConfig.projectId,
-        authDomain: firebaseConfig.authDomain
+        authDomain: firebaseConfig.authDomain,
+        storageBucket: firebaseConfig.storageBucket
       }
     };
   } catch (error) {
@@ -55,5 +62,5 @@ export const testFirebaseConnection = async () => {
   }
 };
 
-export { auth, db };
+export { auth, db, storage };
 export default app;
