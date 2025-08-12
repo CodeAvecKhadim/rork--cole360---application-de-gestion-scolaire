@@ -3,7 +3,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform, View } from "react-native";
-import { School, MessageSquare, MapPin, User, GraduationCap, Home, Users } from "lucide-react-native";
+import { School, MessageSquare, MapPin, User, GraduationCap, Home, Users, BookOpen, BarChart3 } from "lucide-react-native";
 import { COLORS } from "@/constants/colors";
 import { useAuth } from "@/hooks/auth-store";
 import SubscriptionGuard from "@/components/SubscriptionGuard";
@@ -66,7 +66,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: "Accueil",
+          title: role === 'admin' ? "Administration" : 
+                 role === 'schoolAdmin' ? "Direction" :
+                 role === 'teacher' ? "Enseignement" : "Accueil",
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               alignItems: 'center',
@@ -76,7 +78,11 @@ export default function TabLayout() {
               borderRadius: 16,
               backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
             }}>
-              <Home size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+              {role === 'admin' ? (
+                <BarChart3 size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+              ) : (
+                <Home size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+              )}
             </View>
           ),
         }}
@@ -109,7 +115,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="classes"
           options={{
-            title: "Mes Classes",
+            title: role === "teacher" ? "Mes Classes" : "Classes",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -119,19 +125,19 @@ export default function TabLayout() {
                 borderRadius: 16,
                 backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
               }}>
-                <Users size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+                <BookOpen size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
               </View>
             ),
           }}
         />
       )}
 
-      {/* Onglet Élèves - Visible uniquement pour les parents */}
-      {role === "parent" && (
+      {/* Onglet Élèves - Visible pour les parents et directeurs d'école */}
+      {(role === "parent" || role === "schoolAdmin") && (
         <Tabs.Screen
           name="students"
           options={{
-            title: "Enfants",
+            title: role === "parent" ? "Mes Enfants" : "Élèves",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',

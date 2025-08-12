@@ -6,13 +6,14 @@ import { COLORS, GRADIENTS, APP_CONFIG } from '@/constants/colors';
 import { useAuth } from '@/hooks/auth-store';
 import { useData } from '@/hooks/data-store';
 import Card from '@/components/Card';
-import StatsCard from '@/components/StatsCard';
 import Avatar from '@/components/Avatar';
-import { Bell, MessageSquare, Users, BookOpen, School, TrendingUp, Calendar, Award, Target, Clock, CheckCircle, AlertTriangle, BarChart3, PieChart, Activity } from 'lucide-react-native';
+
+import { Bell, MessageSquare, Users, BookOpen, School, TrendingUp, Calendar, Award, Settings, UserCheck, FileText, MapPin } from 'lucide-react-native';
 
 export default function DashboardScreen() {
   const router = useRouter();
   const { user } = useAuth();
+
   const { 
     getUnreadNotificationsCount, 
     getSchools, 
@@ -40,16 +41,38 @@ export default function DashboardScreen() {
         </LinearGradient>
       </View>
 
-      <Card title="Gestion des écoles" style={styles.enhancedCard}>
-        <TouchableOpacity 
-          style={styles.gradientButton}
-          onPress={() => router.push('/(app)/manage-schools' as any)}
-        >
-          <LinearGradient colors={GRADIENTS.primarySimple as any} style={styles.gradientButtonInner}>
-            <School size={20} color={COLORS.white} />
-            <Text style={styles.gradientButtonText}>Gérer les écoles</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+      <Card title="Actions administratives" style={styles.enhancedCard}>
+        <View style={styles.adminActionsGrid}>
+          <TouchableOpacity 
+            style={styles.adminActionItem}
+            onPress={() => router.push('/(app)/manage-schools' as any)}
+          >
+            <LinearGradient colors={GRADIENTS.primarySimple as any} style={styles.adminActionGradient}>
+              <School size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.adminActionText}>Gérer les écoles</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.adminActionItem}
+            onPress={() => router.push('/(app)/security-dashboard' as any)}
+          >
+            <LinearGradient colors={GRADIENTS.warm as any} style={styles.adminActionGradient}>
+              <Settings size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.adminActionText}>Sécurité</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.adminActionItem}
+            onPress={() => router.push('/(app)/subscription' as any)}
+          >
+            <LinearGradient colors={GRADIENTS.success as any} style={styles.adminActionGradient}>
+              <Award size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.adminActionText}>Abonnements</Text>
+          </TouchableOpacity>
+        </View>
       </Card>
 
       <Card title="Activité récente" style={styles.enhancedCard}>
@@ -79,19 +102,36 @@ export default function DashboardScreen() {
         </LinearGradient>
       </View>
 
-      <Card title="Tableau de bord école" style={styles.enhancedCard}>
+      <Card title="Gestion de l'établissement" style={styles.enhancedCard}>
         <View style={styles.quickActions}>
-          <TouchableOpacity style={styles.quickActionItem}>
+          <TouchableOpacity 
+            style={styles.quickActionItem}
+            onPress={() => router.push('/(app)/(tabs)/classes' as any)}
+          >
             <LinearGradient colors={GRADIENTS.info as any} style={styles.quickActionGradient}>
-              <Calendar size={24} color={COLORS.white} />
+              <BookOpen size={24} color={COLORS.white} />
             </LinearGradient>
-            <Text style={styles.quickActionText}>Emploi du temps</Text>
+            <Text style={styles.quickActionText}>Classes</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickActionItem}>
+          
+          <TouchableOpacity 
+            style={styles.quickActionItem}
+            onPress={() => router.push('/(app)/(tabs)/students' as any)}
+          >
             <LinearGradient colors={GRADIENTS.warm as any} style={styles.quickActionGradient}>
+              <Users size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.quickActionText}>Élèves</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.quickActionItem}
+            onPress={() => router.push('/(app)/subscription' as any)}
+          >
+            <LinearGradient colors={GRADIENTS.success as any} style={styles.quickActionGradient}>
               <Award size={24} color={COLORS.white} />
             </LinearGradient>
-            <Text style={styles.quickActionText}>Évaluations</Text>
+            <Text style={styles.quickActionText}>Abonnement</Text>
           </TouchableOpacity>
         </View>
       </Card>
@@ -121,8 +161,53 @@ export default function DashboardScreen() {
         </LinearGradient>
       </View>
 
-      <Card title="Emploi du temps à venir" style={styles.enhancedCard}>
+      <Card title="Mes outils d'enseignement" style={styles.enhancedCard}>
+        <View style={styles.teacherToolsGrid}>
+          <TouchableOpacity 
+            style={styles.teacherToolItem}
+            onPress={() => router.push('/(app)/(tabs)/classes' as any)}
+          >
+            <LinearGradient colors={GRADIENTS.info as any} style={styles.teacherToolGradient}>
+              <BookOpen size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.teacherToolText}>Mes Classes</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.teacherToolItem}
+            onPress={() => {
+              // Naviguer vers la première classe pour les notes
+              const classes = user?.schoolId ? getClasses(user.schoolId) : [];
+              if (classes.length > 0) {
+                router.push(`/(app)/grades/${classes[0].id}` as any);
+              }
+            }}
+          >
+            <LinearGradient colors={GRADIENTS.warm as any} style={styles.teacherToolGradient}>
+              <Award size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.teacherToolText}>Notes</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.teacherToolItem}
+            onPress={() => {
+              // Naviguer vers la première classe pour l'assiduité
+              const classes = user?.schoolId ? getClasses(user.schoolId) : [];
+              if (classes.length > 0) {
+                router.push(`/(app)/attendance/${classes[0].id}` as any);
+              }
+            }}
+          >
+            <LinearGradient colors={GRADIENTS.success as any} style={styles.teacherToolGradient}>
+              <UserCheck size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.teacherToolText}>Présences</Text>
+          </TouchableOpacity>
+        </View>
+        
         <View style={styles.scheduleContainer}>
+          <Text style={styles.sectionTitle}>Prochains cours</Text>
           <LinearGradient colors={GRADIENTS.info as any} style={styles.scheduleCard}>
             <View style={styles.scheduleHeader}>
               <Calendar size={20} color={COLORS.white} />
@@ -158,6 +243,45 @@ export default function DashboardScreen() {
               </LinearGradient>
             </TouchableOpacity>
           ))}
+        </View>
+      </Card>
+      
+      <Card title="Actions rapides" style={styles.enhancedCard}>
+        <View style={styles.parentActionsGrid}>
+          <TouchableOpacity 
+            style={styles.parentActionItem}
+            onPress={() => router.push('/(app)/(tabs)/location' as any)}
+          >
+            <LinearGradient colors={GRADIENTS.info as any} style={styles.parentActionGradient}>
+              <MapPin size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.parentActionText}>Localisation</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.parentActionItem}
+            onPress={() => {
+              const students = user ? getStudentsByParent(user.id) : [];
+              if (students.length > 0) {
+                router.push(`/(app)/bulletin/${students[0].id}` as any);
+              }
+            }}
+          >
+            <LinearGradient colors={GRADIENTS.warm as any} style={styles.parentActionGradient}>
+              <FileText size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.parentActionText}>Bulletins</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.parentActionItem}
+            onPress={() => router.push('/(app)/(tabs)/messages' as any)}
+          >
+            <LinearGradient colors={GRADIENTS.success as any} style={styles.parentActionGradient}>
+              <MessageSquare size={24} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.parentActionText}>Messages</Text>
+          </TouchableOpacity>
         </View>
       </Card>
 
@@ -741,5 +865,104 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.gray,
     fontWeight: '500',
+  },
+  // Styles pour les actions administratives
+  adminActionsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 12,
+    gap: 12,
+  },
+  adminActionItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  adminActionGradient: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  adminActionText: {
+    fontSize: 12,
+    color: COLORS.text,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  // Styles pour les outils d'enseignement
+  teacherToolsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 12,
+    marginBottom: 20,
+    gap: 12,
+  },
+  teacherToolItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  teacherToolGradient: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  teacherToolText: {
+    fontSize: 12,
+    color: COLORS.text,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  // Styles pour les actions des parents
+  parentActionsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 12,
+    gap: 12,
+  },
+  parentActionItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  parentActionGradient: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  parentActionText: {
+    fontSize: 12,
+    color: COLORS.text,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  // Style pour les titres de section
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 12,
+    marginTop: 8,
   },
 });
