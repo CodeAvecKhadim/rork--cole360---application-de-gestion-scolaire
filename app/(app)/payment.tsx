@@ -303,10 +303,7 @@ export default function PaymentScreen() {
                 
                 <View style={styles.methodsContainer}>
                   <TouchableOpacity
-                    style={[
-                      styles.methodOption,
-                      selectedMethod === 'wave' && styles.selectedMethod
-                    ]}
+                    style={styles.methodOption}
                     onPress={() => setSelectedMethod('wave')}
                     activeOpacity={0.8}
                   >
@@ -338,10 +335,7 @@ export default function PaymentScreen() {
                   </TouchableOpacity>
                   
                   <TouchableOpacity
-                    style={[
-                      styles.methodOption,
-                      selectedMethod === 'orange_money' && styles.selectedMethod
-                    ]}
+                    style={styles.methodOption}
                     onPress={() => setSelectedMethod('orange_money')}
                     activeOpacity={0.8}
                   >
