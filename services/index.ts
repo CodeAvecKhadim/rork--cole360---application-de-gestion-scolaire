@@ -9,6 +9,10 @@ export { messageService } from './messages';
 export { authService } from './auth';
 export { locationService } from './location';
 
+// Export des nouveaux services
+export { subscriptionService } from './subscription';
+export { paymentService } from './payment';
+
 // Export des types et du service Firestore principal (pour compatibilité)
 export type {
   School,

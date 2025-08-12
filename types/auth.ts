@@ -204,7 +204,39 @@ export interface Subscription {
   startDate: number;
   endDate: number;
   active: boolean;
+  studentsCount: number;
+  totalAmount: number;
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'expired';
+  paymentMethod?: 'wave' | 'orange_money';
+  transactionId?: string;
   createdAt: number;
+  updatedAt: number;
+}
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  pricePerStudent: number;
+  maxStudents: number;
+  features: string[];
+  duration: number; // en mois
+  isActive: boolean;
+}
+
+export interface PaymentTransaction {
+  id: string;
+  subscriptionId: string;
+  userId: string;
+  amount: number;
+  currency: string;
+  paymentMethod: 'wave' | 'orange_money';
+  phoneNumber: string;
+  status: 'pending' | 'success' | 'failed' | 'cancelled';
+  transactionReference?: string;
+  externalTransactionId?: string;
+  failureReason?: string;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface SubjectGrade {

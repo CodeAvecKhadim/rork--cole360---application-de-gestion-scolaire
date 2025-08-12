@@ -6,6 +6,7 @@ import { Platform } from "react-native";
 import { Home, BookOpen, School, MessageSquare, MapPin, User, GraduationCap } from "lucide-react-native";
 import { COLORS } from "@/constants/colors";
 import { useAuth } from "@/hooks/auth-store";
+import SubscriptionGuard from "@/components/SubscriptionGuard";
 
 // Composant de layout pour la navigation par onglets
 export default function TabLayout() {
@@ -13,44 +14,45 @@ export default function TabLayout() {
   const role = user?.role; // Rôle de l'utilisateur connecté (admin, schoolAdmin, teacher, parent)
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: COLORS.primary, // Couleur de l'onglet actif
-        tabBarInactiveTintColor: COLORS.gray, // Couleur de l'onglet inactif
-        headerShown: true, // Afficher l'en-tête
-        tabBarStyle: {
-          backgroundColor: Platform.OS === 'ios' ? 'rgba(255, 255, 255, 0.9)' : COLORS.white,
-          borderTopWidth: 0, // Supprimer la bordure supérieure
-          elevation: 20, // Ombre sur Android
-          shadowColor: '#000', // Ombre sur iOS
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.1,
-          shadowRadius: 12,
-          height: Platform.OS === 'ios' ? 90 : 70,
-          paddingBottom: Platform.OS === 'ios' ? 25 : 10,
-          paddingTop: 10,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-          marginTop: 4,
-        },
-        tabBarIconStyle: {
-          marginTop: 4,
-        },
-        headerStyle: {
-          backgroundColor: COLORS.primary,
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-        headerTintColor: COLORS.white,
-        headerTitleStyle: {
-          fontWeight: '700',
-          fontSize: 18,
-        },
-      }}
-    >
+    <SubscriptionGuard>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: COLORS.primary, // Couleur de l'onglet actif
+          tabBarInactiveTintColor: COLORS.gray, // Couleur de l'onglet inactif
+          headerShown: true, // Afficher l'en-tête
+          tabBarStyle: {
+            backgroundColor: Platform.OS === 'ios' ? 'rgba(255, 255, 255, 0.9)' : COLORS.white,
+            borderTopWidth: 0, // Supprimer la bordure supérieure
+            elevation: 20, // Ombre sur Android
+            shadowColor: '#000', // Ombre sur iOS
+            shadowOffset: { width: 0, height: -4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 12,
+            height: Platform.OS === 'ios' ? 90 : 70,
+            paddingBottom: Platform.OS === 'ios' ? 25 : 10,
+            paddingTop: 10,
+          },
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: '600',
+            marginTop: 4,
+          },
+          tabBarIconStyle: {
+            marginTop: 4,
+          },
+          headerStyle: {
+            backgroundColor: COLORS.primary,
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 0,
+          },
+          headerTintColor: COLORS.white,
+          headerTitleStyle: {
+            fontWeight: '700',
+            fontSize: 18,
+          },
+        }}
+      >
       {/* Onglet Tableau de bord - Visible pour tous les utilisateurs */}
       <Tabs.Screen
         name="dashboard"
@@ -121,6 +123,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <User size={24} color={color} />,
         }}
       />
-    </Tabs>
+      </Tabs>
+    </SubscriptionGuard>
   );
 }
