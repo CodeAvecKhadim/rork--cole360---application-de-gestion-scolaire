@@ -119,6 +119,32 @@ service cloud.firestore {
       allow create: if request.auth != null;
     }
     
+    // Collection subscriptions - Gestion des abonnements
+    match /subscriptions/{subscriptionId} {
+      // Les admins ont accès complet
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Les utilisateurs peuvent lire et modifier leur propre abonnement
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Permettre la création d'abonnement par l'utilisateur
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Collection payments - Gestion des paiements
+    match /payments/{paymentId} {
+      // Les admins ont accès complet
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Les utilisateurs peuvent lire et créer leurs propres paiements
+      allow read, create: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Permettre la création de paiement par l'utilisateur
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // Permettre la mise à jour du statut de paiement
+      allow update: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
     // Règle par défaut - Refuser tout accès non spécifié
     match /{document=**} {
       allow read, write: if false;
