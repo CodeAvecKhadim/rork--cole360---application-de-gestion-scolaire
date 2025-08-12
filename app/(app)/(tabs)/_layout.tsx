@@ -3,7 +3,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform, View } from "react-native";
-import { BookOpen, School, MessageSquare, MapPin, User, GraduationCap, BarChart3 } from "lucide-react-native";
+import { School, MessageSquare, MapPin, User, GraduationCap, Home, Users } from "lucide-react-native";
 import { COLORS } from "@/constants/colors";
 import { useAuth } from "@/hooks/auth-store";
 import SubscriptionGuard from "@/components/SubscriptionGuard";
@@ -76,7 +76,7 @@ export default function TabLayout() {
               borderRadius: 16,
               backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
             }}>
-              <BarChart3 size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+              <Home size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
             </View>
           ),
         }}
@@ -87,7 +87,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="schools"
           options={{
-            title: "Écoles",
+            title: "Établissements",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -109,7 +109,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="classes"
           options={{
-            title: "Classes",
+            title: "Mes Classes",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -119,7 +119,7 @@ export default function TabLayout() {
                 borderRadius: 16,
                 backgroundColor: focused ? `${COLORS.primary}15` : 'transparent',
               }}>
-                <BookOpen size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
+                <Users size={focused ? 22 : 20} color={color} strokeWidth={focused ? 2.5 : 2} />
               </View>
             ),
           }}
@@ -131,7 +131,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="students"
           options={{
-            title: "Élèves",
+            title: "Mes Enfants",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -153,7 +153,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="location"
           options={{
-            title: "Localisation",
+            title: "Géolocalisation",
             tabBarIcon: ({ color, focused }) => (
               <View style={{
                 alignItems: 'center',
@@ -174,7 +174,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="messages"
         options={{
-          title: "Messages",
+          title: "Messagerie",
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               alignItems: 'center',
@@ -194,7 +194,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profil",
+          title: "Mon Profil",
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               alignItems: 'center',
