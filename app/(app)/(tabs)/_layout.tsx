@@ -3,7 +3,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform, View } from "react-native";
-import { School, MessageSquare, MapPin, User, GraduationCap, Home, Users, BookOpen, BarChart3 } from "lucide-react-native";
+import { School, MessageSquare, MapPin, User, GraduationCap, Home, BookOpen, BarChart3 } from "lucide-react-native";
 import { COLORS } from "@/constants/colors";
 import { useAuth } from "@/hooks/auth-store";
 import SubscriptionGuard from "@/components/SubscriptionGuard";
@@ -132,7 +132,7 @@ export default function TabLayout() {
         />
       )}
 
-      {/* Onglet Élèves - Visible pour les parents et directeurs d'école */}
+      {/* Onglet Élèves - Visible uniquement pour les parents et directeurs d'école */}
       {(role === "parent" || role === "schoolAdmin") && (
         <Tabs.Screen
           name="students"
