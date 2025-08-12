@@ -13,6 +13,7 @@ export { storageService } from './storage';
 // Export des nouveaux services
 export { subscriptionService } from './subscription';
 export { paymentService } from './payment';
+export { notificationService } from './notifications';
 
 // Export des types et du service Firestore principal (pour compatibilité)
 export type {
