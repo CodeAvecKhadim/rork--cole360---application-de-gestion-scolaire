@@ -84,4 +84,37 @@ export const THEME = {
   },
 };
 
+// Nouvelles couleurs pour améliorer l'accessibilité
+export const ACCESSIBILITY = {
+  // Couleurs avec contraste élevé
+  highContrast: {
+    text: '#000000',
+    background: '#FFFFFF',
+    primary: '#0066CC',
+    secondary: '#FF6600',
+  },
+  // Tailles de police adaptatives
+  fontSize: {
+    small: 12,
+    medium: 16,
+    large: 20,
+    extraLarge: 24,
+  },
+};
+
+// Animations et transitions
+export const ANIMATIONS = {
+  duration: {
+    fast: 200,
+    normal: 300,
+    slow: 500,
+  },
+  easing: {
+    ease: 'ease',
+    easeIn: 'ease-in',
+    easeOut: 'ease-out',
+    easeInOut: 'ease-in-out',
+  },
+};
+
 export default THEME;
