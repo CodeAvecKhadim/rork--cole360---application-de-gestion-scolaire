@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/libs/firebase';
 import { PaymentTransaction } from '@/types/auth';
+import { CONFIG } from '@/constants/config';
 
 export const paymentService = {
   // Initier un paiement Wave
@@ -109,19 +110,36 @@ export const paymentService = {
     }
   },
 
-  // Vérifier le statut d'un paiement
+  // Vérifier le statut d'un paiement Wave
   async checkPaymentStatus(transactionId: string): Promise<'pending' | 'success' | 'failed' | 'cancelled'> {
     try {
-      // Simuler la vérification du statut
-      // Dans un vrai projet, vous appelleriez l'API du fournisseur de paiement
-      const randomOutcome = Math.random();
+      const waveApiUrl = `${CONFIG.WAVE.IS_SANDBOX ? CONFIG.WAVE.SANDBOX_URL : CONFIG.WAVE.API_URL}/checkout/sessions/${transactionId}`;
       
-      if (randomOutcome > 0.8) {
-        return 'success';
-      } else if (randomOutcome > 0.6) {
-        return 'failed';
-      } else {
-        return 'pending';
+      const response = await fetch(waveApiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${CONFIG.WAVE.API_KEY}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Wave API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Mapper les statuts Wave vers nos statuts internes
+      switch (data.payment_status) {
+        case 'successful':
+          return 'success';
+        case 'failed':
+        case 'expired':
+          return 'failed';
+        case 'cancelled':
+          return 'cancelled';
+        default:
+          return 'pending';
       }
     } catch (error) {
       console.error('Erreur lors de la vérification du statut:', error);
@@ -184,19 +202,50 @@ export const paymentService = {
     }
   },
 
-  // Simuler l'appel à l'API Wave (à remplacer par la vraie API)
+  // Appel à l'API Wave Business
   async callWaveAPI(params: {
     amount: number;
     phoneNumber: string;
     transactionReference: string;
-  }): Promise<{ transactionId: string; status: string }> {
-    // Simulation d'un délai d'API
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      transactionId: `WAVE_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      status: 'pending'
-    };
+  }): Promise<{ transactionId: string; status: string; checkoutUrl?: string }> {
+    try {
+      const waveApiUrl = `${CONFIG.WAVE.IS_SANDBOX ? CONFIG.WAVE.SANDBOX_URL : CONFIG.WAVE.API_URL}/checkout/sessions`;
+      
+      const payload = {
+        amount: params.amount,
+        currency: 'XOF',
+        error_url: CONFIG.APP.ERROR_URL,
+        success_url: CONFIG.APP.SUCCESS_URL,
+        client_reference: params.transactionReference,
+        payment_method: 'wave_senegal',
+        mobile: params.phoneNumber.replace('+', ''),
+        when_completed: 'redirect'
+      };
+
+      const response = await fetch(waveApiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${CONFIG.WAVE.API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Wave API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      return {
+        transactionId: data.id,
+        status: 'pending',
+        checkoutUrl: data.wave_launch_url
+      };
+    } catch (error) {
+      console.error('Erreur API Wave:', error);
+      throw error;
+    }
   },
 
   // Simuler l'appel à l'API Orange Money (à remplacer par la vraie API)
