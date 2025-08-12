@@ -126,9 +126,18 @@ export const subscriptionService = {
         createdAt: data.createdAt?.toMillis() || Date.now(),
         updatedAt: data.updatedAt?.toMillis() || Date.now()
       } as Subscription;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de la récupération de l\'abonnement:', error);
-      throw error;
+      
+      if (error?.code === 'permission-denied') {
+        throw new Error('Accès refusé. Veuillez vérifier vos permissions ou vous reconnecter.');
+      }
+      
+      if (error?.code === 'failed-precondition') {
+        throw new Error('Configuration de base de données incomplète. Veuillez contacter le support.');
+      }
+      
+      throw new Error('Erreur lors du chargement de l\'abonnement. Veuillez réessayer.');
     }
   },
 
@@ -215,9 +224,18 @@ export const subscriptionService = {
           updatedAt: data.updatedAt?.toMillis() || Date.now()
         } as Subscription;
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de la récupération de l\'historique:', error);
-      throw error;
+      
+      if (error?.code === 'permission-denied') {
+        throw new Error('Accès refusé. Veuillez vérifier vos permissions ou vous reconnecter.');
+      }
+      
+      if (error?.code === 'failed-precondition') {
+        throw new Error('Configuration de base de données incomplète. Veuillez contacter le support.');
+      }
+      
+      throw new Error('Erreur lors du chargement de l\'historique. Veuillez réessayer.');
     }
   },
 

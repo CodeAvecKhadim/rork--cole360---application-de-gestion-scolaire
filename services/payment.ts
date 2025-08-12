@@ -196,9 +196,18 @@ export const paymentService = {
           updatedAt: data.updatedAt?.toMillis() || Date.now()
         } as PaymentTransaction;
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de la récupération de l\'historique des paiements:', error);
-      throw error;
+      
+      if (error?.code === 'permission-denied') {
+        throw new Error('Accès refusé. Veuillez vérifier vos permissions ou vous reconnecter.');
+      }
+      
+      if (error?.code === 'failed-precondition') {
+        throw new Error('Configuration de base de données incomplète. Veuillez contacter le support.');
+      }
+      
+      throw new Error('Erreur lors du chargement de l\'historique des paiements. Veuillez réessayer.');
     }
   },
 

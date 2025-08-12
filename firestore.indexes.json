@@ -59,6 +59,90 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "classes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ecole_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nom",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "eleves",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "classe_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nom",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "notes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "eleve_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_creation",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "messages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "destinataire_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_envoi",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "messages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "expediteur_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_envoi",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "locations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "eleve_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []
