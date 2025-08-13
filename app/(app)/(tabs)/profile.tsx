@@ -141,28 +141,44 @@ export default function ProfileScreen() {
 
         <Card title="Actions rapides" variant="elevated">
           <View style={styles.quickActions}>
-            <TouchableOpacity style={styles.quickActionItem}>
+            <TouchableOpacity 
+              style={styles.quickActionItem}
+              onPress={() => {
+                Alert.alert('Modifier le profil', 'Cette fonctionnalité sera bientôt disponible.');
+              }}
+            >
               <LinearGradient colors={GRADIENTS.info as any} style={styles.quickActionIcon}>
                 <Edit3 size={24} color={COLORS.white} />
               </LinearGradient>
               <Text style={styles.quickActionText}>Modifier le profil</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.quickActionItem}>
+            <TouchableOpacity 
+              style={styles.quickActionItem}
+              onPress={() => router.push('/security-dashboard')}
+            >
               <LinearGradient colors={GRADIENTS.warm as any} style={styles.quickActionIcon}>
                 <Shield size={24} color={COLORS.white} />
               </LinearGradient>
               <Text style={styles.quickActionText}>Sécurité</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.quickActionItem}>
+            <TouchableOpacity 
+              style={styles.quickActionItem}
+              onPress={() => router.push('/notifications')}
+            >
               <LinearGradient colors={GRADIENTS.success as any} style={styles.quickActionIcon}>
                 <Bell size={24} color={COLORS.white} />
               </LinearGradient>
               <Text style={styles.quickActionText}>Notifications</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.quickActionItem}>
+            <TouchableOpacity 
+              style={styles.quickActionItem}
+              onPress={() => {
+                Alert.alert('Paramètres', 'Cette fonctionnalité sera bientôt disponible.');
+              }}
+            >
               <LinearGradient colors={GRADIENTS.secondary as any} style={styles.quickActionIcon}>
                 <Settings size={24} color={COLORS.white} />
               </LinearGradient>
