@@ -549,6 +549,55 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     }
   }, [user?.id, loading, currentSession, logSecurityEvent, user]);
   
+  // Fonction pour mettre à jour le profil
+  const updateProfile = useCallback(async (profileData: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    country?: string;
+  }) => {
+    if (!user) {
+      throw new Error('Utilisateur non connecté');
+    }
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Simulation d'un délai d'API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mettre à jour les données utilisateur
+      const userIndex = mockUsers.findIndex(u => u.id === user.id);
+      if (userIndex !== -1) {
+        mockUsers[userIndex] = {
+          ...mockUsers[userIndex],
+          ...profileData,
+          updatedAt: Date.now(),
+        };
+        
+        // Mettre à jour l'état local
+        const updatedUser = { ...user, ...profileData, updatedAt: Date.now() };
+        setUser(updatedUser);
+        await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+      
+      await logSecurityEvent('PROFILE_UPDATED', 'profile', user.id, true, {
+        updatedFields: Object.keys(profileData)
+      });
+      
+      console.log('Profil mis à jour avec succès pour l\'utilisateur:', user.id);
+      
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la mise à jour du profil';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [user, logSecurityEvent]);
+  
   // Fonction pour changer le mot de passe
   const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
     if (!user) {
@@ -612,6 +661,7 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     resetPassword,
     logout,
     changePassword,
+    updateProfile,
     getRememberedEmail,
     
     // Utilitaires
@@ -621,5 +671,5 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     },
     getUserRole: () => user?.role,
     getUserPermissions: () => user?.permissions,
-  }), [user, loading, error, currentSession, login, signup, resetPassword, logout, changePassword, getRememberedEmail]);
+  }), [user, loading, error, currentSession, login, signup, resetPassword, logout, changePassword, updateProfile, getRememberedEmail]);
 });

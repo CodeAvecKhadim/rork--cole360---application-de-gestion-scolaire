@@ -143,9 +143,7 @@ export default function ProfileScreen() {
           <View style={styles.quickActions}>
             <TouchableOpacity 
               style={styles.quickActionItem}
-              onPress={() => {
-                Alert.alert('Modifier le profil', 'Cette fonctionnalité sera bientôt disponible.');
-              }}
+              onPress={() => router.push('/edit-profile')}
             >
               <LinearGradient colors={GRADIENTS.info as any} style={styles.quickActionIcon}>
                 <Edit3 size={24} color={COLORS.white} />
@@ -175,9 +173,7 @@ export default function ProfileScreen() {
             
             <TouchableOpacity 
               style={styles.quickActionItem}
-              onPress={() => {
-                Alert.alert('Paramètres', 'Cette fonctionnalité sera bientôt disponible.');
-              }}
+              onPress={() => router.push('/settings')}
             >
               <LinearGradient colors={GRADIENTS.secondary as any} style={styles.quickActionIcon}>
                 <Settings size={24} color={COLORS.white} />
